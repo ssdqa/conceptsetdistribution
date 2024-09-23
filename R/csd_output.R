@@ -26,6 +26,8 @@
 #' @return a graph to visualize the results from `csd_process` based on the parameters provided; see documentation
 #'         for individual subfunctions for details on specific output
 #'
+#' @export
+#'
 csd_output <- function(process_output,
                        output_function,
                        concept_set = conceptsetdistribution::csd_concept_set,
