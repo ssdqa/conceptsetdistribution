@@ -4,6 +4,7 @@
 #' @param process_output the output from `csd_process`
 #' @param output_function the name of the output function that should be used provided in the `parameter_summary` csv
 #'                        file that is output to the provided results folder after running the `csd_process` function
+#' @param concept_set the same concept set used in the `csd_process` function; only required if `vocab_tbl` is not NULL
 #' @param vocab_tbl OPTIONAL: the location of an external vocabulary table containing concept names for
 #'                  the provided codes. if not NULL, concept names will be available in either a reference
 #'                  table or in a hover tooltip
@@ -22,11 +23,12 @@
 #' @param output_value the column in `process_output` that should be used in the visualization
 #'                     relevant for @ss_exp_at, @ms_anom_nt, and @ms_exp_at
 #'
-#' @return
+#' @return a graph to visualize the results from `csd_process` based on the parameters provided; see documentation
+#'         for individual subfunctions for details on specific output
 #'
-csd_output <- function(process_output=process_output,
+csd_output <- function(process_output,
                        output_function,
-                       concept_set = read_codeset('csd_codesets_jspa','iccccc'),
+                       concept_set = conceptsetdistribution::csd_concept_set,
                        vocab_tbl = vocabulary_tbl('concept'),
                        num_variables = 10,
                        num_mappings = 10,

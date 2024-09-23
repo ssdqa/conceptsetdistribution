@@ -1,13 +1,20 @@
 
 #'
+#' @import ggplot2
 #' @import gt
 #' @import ggiraph
-#' @import plotly
+#' @importFrom plotly ggplotly
 #' @import cli
 #' @importFrom tidyr pivot_longer
+#' @importFrom tidyr unite
 #' @importFrom qicharts2 qic
 #' @importFrom timetk plot_anomalies
 #' @importFrom timetk plot_anomalies_decomp
+#' @importFrom graphics text
+#' @importFrom stats sd
+#' @importFrom utils head
+#' @importFrom purrr set_names
+#' @importFrom plotly layout
 #'
 NULL
 
@@ -16,6 +23,8 @@ NULL
 #'
 #'
 #' @param process_output the output from `csd_process`
+#' @param concept_col the name of the column from the concept_set used to identify concepts
+#'                    should be either `concept_id` or `concept_code`
 #' @param num_codes an integer to represent the top number of codes to include in the mappings for the exploratory analyses;
 #'                  will pick the codes based on the highest count of the most commonly appearing variables;
 #' @param num_mappings an integer to represent the top number of mappings for a given variable in the exploratory analyses
@@ -88,8 +97,8 @@ csd_ss_exp_nt <- function(process_output,
            y = map_col)
 
     p <- girafe(ggobj = plot,
-                width = 10,
-                height = 10)
+                width_svg = 10,
+                height_svg = 10)
 
   ref_tbl <- generate_ref_table(tbl = final, #%>% mutate(concept_id = as.integer(concept_id)) %>%
                                   #select(-concept_name),
@@ -173,8 +182,8 @@ csd_ss_anom_nt <- function(process_output,
       theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust=1))
 
     p <- girafe(ggobj=plot,
-                width=10,
-                height=10)
+                width_svg=10,
+                height_svg=10)
 
   return(p)
 }
@@ -187,6 +196,8 @@ csd_ss_anom_nt <- function(process_output,
 #'
 #'
 #' @param process_output dataframe output by `csd_process`
+#' @param concept_col the name of the column from the concept_set used to identify concepts
+#'                    should be either `concept_id` or `concept_code`
 #' @param filtered_var the variable to perform the anomaly detection for
 #' @param filter_concept the concept_id of interest for the analysis
 #' @param facet the variables by which you would like to facet the graph; defaults to NULL
@@ -218,7 +229,7 @@ csd_ss_anom_at <- function(process_output,
   c_final <- c_added %>% group_by(!!!syms(facet), time_start, ct_concept) %>%
     unite(facet_col, !!!syms(facet), sep = '\n')
 
-  c_plot <- qic(data = c_final, x = time_start, y = ct_concept, chart = 'pp', facet = ~facet_col,
+  c_plot <- qic(data = c_final, x = time_start, y = ct_concept, chart = 'pp', facets = ~facet_col,
                 title = 'Control Chart: Code Usage Over Time', show.grid = TRUE, n = ct_denom,
                 ylab = 'Proportion', xlab = 'Time')
 
@@ -278,6 +289,8 @@ csd_ss_anom_at <- function(process_output,
 #' *Single Site, Exploratory, Across Time*
 #'
 #' @param process_output dataframe output by `csd_process`
+#' @param concept_col the name of the column from the concept_set used to identify concepts
+#'                    should be either `concept_id` or `concept_code`
 #' @param filtered_var the variable to perform the anomaly detection for
 #' @param num_mappings an integer indicating the number of top codes for the
 #'                     filtered_var of interest that should be displayed
@@ -365,6 +378,8 @@ csd_ss_exp_at <- function(process_output,
 #' *Multi Site, Exploratory, Across Time*
 #'
 #' @param process_output dataframe output by `csd_process`
+#' @param concept_col the name of the column from the concept_set used to identify concepts
+#'                    should be either `concept_id` or `concept_code`
 #' @param filtered_var the variable(s) to perform the anomaly detection for
 #' @param filtered_concept the concept_id(s) of interest for the analysis
 #' @param output_value the numerical column in the data that should be displayed
@@ -441,6 +456,8 @@ csd_ms_exp_at <- function(process_output,
 #' @param process_output dataframe output by `csd_process`
 #' @param facet the variables by which you would like to facet the graph;
 #'              defaults to NULL
+#' @param concept_col the name of the column from the concept_set used to identify concepts
+#'                    should be either `concept_id` or `concept_code`
 #' @param num_codes the number of top codes per variable that should be
 #'                  displayed in the table
 #'
@@ -504,14 +521,14 @@ csd_ms_exp_nt <- function(process_output,
 #' *Multi-Site Anomaly No Time*
 #'
 #' @param process_output output from `csd_process`
+#' @param concept_col the name of the column from the concept_set used to identify concepts
+#'                    should be either `concept_id` or `concept_code`
 #' @param text_wrapping_char the number of characters for the `concept_name` or `concept_id` to
 #'                           display on heatmap; limited to 80
 #' @param filtered_var the variable to perform the analysis on from the data frame; column name
 #'                     that contains the variable names should be labeled `variable`
 #' @param comparison_col the column that computes the quantitative value for comparison across sites;
 #'                       in `csd` check, it is the `prop_concept`
-#' @param grouped_vars a vector containing the variables to group by to compute the mean across the sites;
-#'                     in `csd` check, defaulted to c(`variable`, `concept_id`)
 #'
 #' @return a dot plot where the shape of the dot represents whether the point is
 #'         anomalous, the color of the dot represents the proportion of usage for
@@ -571,6 +588,8 @@ csd_ms_anom_nt<-function(process_output,
 #'
 #' @param process_output output from `csd_process`
 #' @param filter_concept the concept_id that should be used for the output
+#' @param concept_col the name of the column from the concept_set used to identify concepts
+#'                    should be either `concept_id` or `concept_code`
 #' @return three graphs:
 #'    1) Loess smoothed line graph that shows the proportion of a code across time
 #'    with the Euclidean Distance associated with each line

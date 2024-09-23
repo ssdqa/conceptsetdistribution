@@ -28,7 +28,7 @@ check_code_dist_csd <- function(cohort_codedist,
                                 time = FALSE,
                                 time_span,
                                 time_period,
-                                domain_tbl = ssdqa.gen::sample_domain_file){
+                                domain_tbl = conceptsetdistribution::csd_domain_file){
 
 
   domain_filter <-
@@ -40,14 +40,14 @@ check_code_dist_csd <- function(cohort_codedist,
 
   for(i in 1:nrow(domain_filter)) {
 
-    dates <- domain_filter$date_col[[i]]
+    dates <- domain_filter$date_field[[i]]
 
-    domain_tbl_name <- domain_filter[i,]$domain_tbl %>% pull
+    domain_tbl_name <- domain_filter[i,]$domain %>% pull
     domain_tbl_cdm <- cohort_codedist %>%
       inner_join(cdm_tbl(domain_tbl_name)) %>%
       filter(!!sym(dates) >= start_date,
              !!sym(dates) <= end_date)
-    final_col <- domain_filter[i,]$concept_col
+    final_col <- domain_filter[i,]$concept_field
 
     if(time){
       fact_tbl <-
@@ -145,7 +145,7 @@ check_code_dist_ssanom <- function(cohort_codedist,
                                    num_concept_combined = FALSE,
                                    num_concept_1 = 30,
                                    num_concept_2 = 30,
-                                   domain_tbl = ssdqa.gen::sample_domain_file){
+                                   domain_tbl = conceptsetdistribution::csd_domain_file){
 
 
   domain_filter <-
@@ -173,13 +173,20 @@ check_code_dist_ssanom <- function(cohort_codedist,
         final_col <-
           domain_filter %>%
           filter(domain == domain_name) %>%
-          select(concept_col) %>% pull()
+          select(concept_field) %>% pull()
+
+        date_col <-
+          domain_filter %>%
+          filter(domain == domain_name) %>%
+          select(date_field) %>% pull()
 
         one_domain_tbl <-
           cohort_codedist %>%
           inner_join(
             cdm_tbl(domain_name)
           ) %>%
+          filter(!!sym(date_col) >= start_date,
+                 !!sym(date_col) <= end_date) %>%
           inner_join(variable_filtered,
                      by=setNames('concept_id',final_col)) %>%
           select(person_id,

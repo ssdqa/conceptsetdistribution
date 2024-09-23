@@ -10,7 +10,7 @@ check_code_dist_csd(
   time = FALSE,
   time_span,
   time_period,
-  domain_tbl = ssdqa.gen::sample_domain_file
+  domain_tbl = conceptsetdistribution::csd_domain_file
 )
 }
 \arguments{

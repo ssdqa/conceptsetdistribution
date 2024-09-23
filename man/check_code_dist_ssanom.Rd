@@ -10,7 +10,7 @@ check_code_dist_ssanom(
   num_concept_combined = FALSE,
   num_concept_1 = 30,
   num_concept_2 = 30,
-  domain_tbl = ssdqa.gen::sample_domain_file
+  domain_tbl = conceptsetdistribution::csd_domain_file
 )
 }
 \arguments{

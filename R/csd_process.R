@@ -8,10 +8,11 @@
 #' @param cohort cohort for SSDQA testing; required fields:
 #'               `site` | `person_id` | `start_date` | `end_date` where start and end date
 #' @param domain_tbl tbl that is similar to the SCV check;
-#'                   four columns: `domain` | `source_col` | `concept_col` | `date_col`;
-#'                   the required columns for the csd check are only `domain_tbl`, `concept_col`, `date_col`
+#'                   four columns: `domain` | `concept_field` | `date_field` | `vocabulary_field`
+#'
+#'                   the vocabulary_field column is only required for the PCORnet CDM
 #' @param concept_set concept set CSV file with the following columns:
-#'                    `concept_id` | `concept_code` | `concept_name` | `vocabulary_id` | `category` | `variable` | `domain`
+#'                    `concept_id` | `concept_code` | `concept_name` | `vocabulary_id` | `variable` | `domain`
 #'                    The variable field is required to categorize each concept set into a particular variable
 #'                    The domain is required so that the function knows which table to join to in order to derive counts
 #' @param multi_or_single_site direction to determine what kind of check to run
@@ -56,12 +57,13 @@
 #'
 #' @import argos
 #' @import ssdqa.gen
+#' @importFrom stringr str_wrap
 #'
 #' @export
 #'
-csd_process <- function(cohort = results_tbl('jspa_cohort'),
-                        domain_tbl=read_codeset('scv_domains', 'cccc'),
-                        concept_set = read_codeset('csd_codesets_jspa','iccccc'),
+csd_process <- function(cohort,
+                        domain_tbl= conceptsetdistribution::csd_domain_file,
+                        concept_set = conceptsetdistribution::csd_concept_set,
                         multi_or_single_site = 'single',
                         anomaly_or_exploratory='exploratory',
                         num_concept_combined = FALSE,

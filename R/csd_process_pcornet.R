@@ -1,17 +1,16 @@
 
 
-#' CSD Process function
+#' CSD Process function for PCORnet CDM
 #'
 #' add csv output of main table and csv output of param summary
 #' (that function needs updating to be more generalizable)
 #'
 #' @param cohort cohort for SSDQA testing; required fields:
-#'               `site` | `person_id` | `start_date` | `end_date` where start and end date
+#'               `site` | `patid` | `start_date` | `end_date` where start and end date
 #' @param domain_tbl tbl that is similar to the SCV check;
-#'                   four columns: `domain` | `source_col` | `concept_col` | `date_col`;
-#'                   the required columns for the csd check are only `domain_tbl`, `concept_col`, `date_col`
+#'                   four columns: `domain` | `concept_field` | `date_field` | `vocabulary_field`
 #' @param concept_set concept set CSV file with the following columns:
-#'                    `concept_id` | `concept_code` | `concept_name` | `vocabulary_id` | `category` | `variable` | `domain`
+#'                    `concept_id` | `concept_code` | `concept_name` | `vocabulary_id` | `variable` | `domain`
 #'                    The variable field is required to categorize each concept set into a particular variable
 #'                    The domain is required so that the function knows which table to join to in order to derive counts
 #' @param multi_or_single_site direction to determine what kind of check to run
@@ -29,6 +28,7 @@
 #' @param num_concept_2 when `mult_or_single_site` = `single` and `anomaly_or_exploratory` = `anomaly`,
 #'                             this argument is an integer and requires a minimum number of times that
 #'                             the *second* concept appears in the dataset
+#' @param p_value the p value to be used as a threshold in the multi-site anomaly detection analysis
 #' @param age_groups N/A for this check?
 #' @param time logical to determine whether to output the check across time
 #' @param time_span when `time = TRUE`, a vector of two dates for the observation period of the study
@@ -46,19 +46,19 @@
 #'             `site` | `time_start` | `time_increment` | `variable` | `ct_denom` | `concept_id` | `ct_concept` | `prop_concept`
 #'
 #'
-csd_process <- function(cohort,
-                        domain_tbl=read_codeset('scv_domains', 'cccc'),
-                        concept_set = read_codeset('csd_codesets','iccccc'),
-                        multi_or_single_site = 'single',
-                        anomaly_or_exploratory='exploratory',
-                        num_concept_combined = FALSE,
-                        num_concept_1 = 30,
-                        num_concept_2 = 30,
-                        p_value = 0.9,
-                        age_groups = FALSE, #read_codeset('age_group_definitions'),
-                        time = TRUE,
-                        time_span = c('2012-01-01', '2020-01-01'),
-                        time_period = 'year'
+csd_process_pcornet <- function(cohort,
+                                domain_tbl= conceptsetdistribution::csd_domain_file,
+                                concept_set = conceptsetdistribution::csd_concept_set,
+                                multi_or_single_site = 'single',
+                                anomaly_or_exploratory='exploratory',
+                                num_concept_combined = FALSE,
+                                num_concept_1 = 30,
+                                num_concept_2 = 30,
+                                p_value = 0.9,
+                                age_groups = FALSE, #read_codeset('age_group_definitions'),
+                                time = TRUE,
+                                time_span = c('2012-01-01', '2020-01-01'),
+                                time_period = 'year'
 ){
 
   ## parameter summary output

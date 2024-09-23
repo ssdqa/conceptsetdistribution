@@ -5,10 +5,25 @@ Authors@R:
     person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
 Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+License: Artistic-2.0
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
 Imports: 
-    magrittr
+    cli (>= 3.6.3),
+    dplyr (>= 1.1.4),
+    ggiraph (>= 0.8.9),
+    ggplot2 (>= 3.5.0),
+    gt (>= 0.11.0),
+    magrittr,
+    plotly (>= 4.10.4),
+    purrr (>= 1.0.2),
+    qicharts2 (>= 0.7.4),
+    stringr (>= 1.5.1),
+    tidyr (>= 1.3.1),
+    timetk (>= 2.9.0)
+Depends: 
+    argos,
+    R (>= 2.10),
+    ssdqa.gen
+LazyData: true
