@@ -7,11 +7,12 @@
 \format{
 \subsection{\code{csd_domain_file}}{
 
-A data frame with 2 rows and 3 columns
+A data frame with 3 rows and 3 columns
 \describe{
 \item{domain}{The name of the CDM table associated with the domain where the concept of interest can be found. Should match the domain listed in the concept_set file.}
 \item{concept_field}{The name of the column in the domain table that contains the concepts of interest listed in the concept_set file.}
 \item{date_field}{The name of the column in the domain table that contains dates to be used for time-based filtering.}
+\item{vocabulary_field}{(PCORnet only) The name of the column in the domain table where the vocabulary type is stored}
 }
 }
 }

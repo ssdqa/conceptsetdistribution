@@ -2,11 +2,11 @@
 #'
 #' @import ggplot2
 #' @import gt
-#' @import ggiraph
-#' @importFrom plotly ggplotly
 #' @import cli
+#' @import ggiraph
 #' @importFrom tidyr pivot_longer
 #' @importFrom tidyr unite
+#' @importFrom tidyr tibble
 #' @importFrom qicharts2 qic
 #' @importFrom timetk plot_anomalies
 #' @importFrom timetk plot_anomalies_decomp
@@ -84,7 +84,7 @@ csd_ss_exp_nt <- function(process_output,
 
   facet <- facet %>% append('xaxis')
 
-    plot <- final %>% ggplot(aes(x = xaxis, y = as.character(!!sym(map_col)),
+    plt <- final %>% ggplot(aes(x = xaxis, y = as.character(!!sym(map_col)),
                                  fill = !!sym(prop))) +
       geom_tile_interactive(aes(tooltip = concept_name)) +
       geom_text(aes(label = !!sym(prop)), size = 3, color = 'black') +
@@ -96,9 +96,8 @@ csd_ss_exp_nt <- function(process_output,
            x = col,
            y = map_col)
 
-    p <- girafe(ggobj = plot,
-                width_svg = 10,
-                height_svg = 10)
+    plt[["metadata"]] <- tibble('pkg_backend' = 'ggiraph',
+                                 'tooltip' = TRUE)
 
   ref_tbl <- generate_ref_table(tbl = final, #%>% mutate(concept_id = as.integer(concept_id)) %>%
                                   #select(-concept_name),
@@ -106,7 +105,7 @@ csd_ss_exp_nt <- function(process_output,
                                 name_col = col,
                                 denom = denom)
 
-  output <- list(p, ref_tbl)
+  output <- list(plt, ref_tbl)
 
   return(output)
 }
@@ -167,7 +166,7 @@ csd_ss_anom_nt <- function(process_output,
     filter(concept1 %in% vars & concept2 %in% vars)
 
   ## Output graph
-    plot <- final %>% filter(variable==filtered_var) %>% filter(above_sd == TRUE) %>%
+    plt <- final %>% filter(variable==filtered_var) %>% filter(above_sd == TRUE) %>%
       ggplot(aes(x = as.character(concept1), y = as.character(concept2),
              fill = jaccard_index)) +
       geom_tile_interactive(aes(tooltip = paste0('concept1 = ',conceptname1, '; n= ',concept1_ct,'\n','concept2 = ',conceptname2,'; n= ',concept2_ct,
@@ -181,11 +180,10 @@ csd_ss_anom_nt <- function(process_output,
       theme_minimal() +
       theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust=1))
 
-    p <- girafe(ggobj=plot,
-                width_svg=10,
-                height_svg=10)
+    plt[["metadata"]] <- tibble('pkg_backend' = 'ggiraph',
+                                'tooltip' = TRUE)
 
-  return(p)
+  return(plt)
 }
 
 ### ACROSS TIME
@@ -248,7 +246,8 @@ csd_ss_anom_at <- function(process_output,
          y = 'Proportion')+
     theme_minimal()
 
-  output_int <- ggplotly(new_pp)
+  new_pp[['metadata']] <- tibble('pkg_backend' = 'plotly',
+                                 'tooltip' = FALSE)
 
   ref_tbl <- generate_ref_table(tbl = c_added %>% filter(variable == filtered_var,
                                                          !!sym(concept_col) == filter_concept), #%>%
@@ -259,7 +258,7 @@ csd_ss_anom_at <- function(process_output,
                                 #vocab_tbl = vocab_tbl,
                                 time = TRUE)
 
-  output <- list(output_int, ref_tbl)
+  output <- list(new_pp, ref_tbl)
 
   }else{
 
@@ -278,6 +277,8 @@ csd_ss_anom_at <- function(process_output,
       layout(title = paste0('Anomalies for Code ', filter_concept, ': ', concept_nm))
 
     output <- list(anomalies, decomp)
+
+    cli::cli_inform('This output uses an external package with preset theming - no additional customizations are available.')
 
   }
 
@@ -366,12 +367,13 @@ csd_ss_exp_at <- function(process_output,
     theme_minimal() +
     scale_color_ssdqa()
 
-  plot <- ggplotly(p, tooltip = "text")
+  p[["metadata"]] <- tibble('pkg_backend' = 'plotly',
+                            'tooltip' = TRUE)
 
 
-  output <- list(plot, ref_tbl)
+  output <- list(p, ref_tbl)
 
-
+  return(output)
 
 }
 
@@ -441,12 +443,13 @@ csd_ms_exp_at <- function(process_output,
     theme_minimal() +
     scale_color_ssdqa()
 
-  plot <- ggplotly(p, tooltip = "text")
+  p[["metadata"]] <- tibble('pkg_backend' = 'plotly',
+                            'tooltip' = TRUE)
 
 
-  output <- list(plot, ref_tbl)
+  output <- list(p, ref_tbl)
 
-
+  return(output)
 
 }
 
@@ -581,7 +584,11 @@ csd_ms_anom_nt<-function(process_output,
            shape = guide_legend(title = 'Anomaly'),
            size = 'none')
 
-  girafe(ggobj = plt)
+  plt[["metadata"]] <- tibble('pkg_backend' = 'ggiraph',
+                              'tooltip' = TRUE)
+
+  return(plt)
+
 }
 
 #' **Multi-Site Across Time Anomaly**
@@ -653,28 +660,36 @@ csd_ms_anom_at <- function(process_output,
     distinct(site, dist_eucl_mean, site_loess) %>%
     group_by(site, dist_eucl_mean) %>%
     summarise(mean_site_loess = mean(site_loess)) %>%
-    ggplot(aes(x = site, y = dist_eucl_mean, fill = mean_site_loess)) +
-    geom_col() +
-    geom_text(aes(label = dist_eucl_mean), vjust = 2, size = 3,
-              show.legend = FALSE) +
-    coord_radial(r_axis_inside = FALSE, rotate_angle = TRUE) +
+    mutate(tooltip = paste0('Site: ', site,
+                            '\nEuclidean Distance: ', dist_eucl_mean,
+                            '\nAverage Loess Proportion: ', mean_site_loess)) %>%
+    ggplot(aes(x = site, y = dist_eucl_mean, fill = mean_site_loess, tooltip = tooltip)) +
+    geom_col_interactive() +
+    # geom_text(aes(label = dist_eucl_mean), vjust = 2, size = 3,
+    #           show.legend = FALSE) +
+    coord_radial(r.axis.inside = FALSE, rotate.angle = TRUE) +
     guides(theta = guide_axis_theta(angle = 0)) +
-    #scale_y_continuous(limits = c(-1,ylim_max)) +
     theme_minimal() +
     scale_fill_ssdqa(palette = 'diverging', discrete = FALSE) +
-    theme(legend.position = 'bottom',
-          legend.text = element_text(angle = 45, vjust = 0.9, hjust = 1),
-          axis.text.x = element_text(face = 'bold')) +
+    # theme(legend.position = 'bottom',
+    #       legend.text = element_text(angle = 45, vjust = 0.9, hjust = 1),
+    #       axis.text.x = element_text(face = 'bold'))
     labs(fill = 'Avg. Proportion \n(Loess)',
          y ='Euclidean Distance',
          x = '',
          title = paste0('Euclidean Distance for ', filter_concept))
 
-  plotly_p <- ggplotly(p,tooltip="text")
-  plotly_q <- ggplotly(q,tooltip="text")
+  p[['metadata']] <- tibble('pkg_backend' = 'plotly',
+                            'tooltip' = TRUE)
 
-  output <- list(plotly_p,
-                 plotly_q,
+  q[['metadata']] <- tibble('pkg_backend' = 'plotly',
+                            'tooltip' = TRUE)
+
+  t[['metadata']] <- tibble('pkg_backend' = 'ggiraph',
+                            'tooltip' = TRUE)
+
+  output <- list(p,
+                 q,
                  t)
 
   return(output)
