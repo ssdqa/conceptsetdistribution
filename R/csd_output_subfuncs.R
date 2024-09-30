@@ -253,7 +253,7 @@ csd_ss_anom_at <- function(process_output,
   ref_tbl <- generate_ref_table(tbl = c_added %>% filter(variable == filtered_var,
                                                          !!sym(concept_col) == filter_concept), #%>%
                                   #mutate(concept_id=as.integer(concept_id)),
-                                id_col = !!sym(concept_col),
+                                id_col = concept_col,
                                 denom = 'ct_concept',
                                 name_col = 'concept_name',
                                 #vocab_tbl = vocab_tbl,
