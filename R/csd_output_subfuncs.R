@@ -91,7 +91,7 @@ csd_ss_exp_nt <- function(process_output,
       scale_fill_ssdqa(palette = 'diverging', discrete = FALSE) +
       facet_wrap((facet), scales = 'free') +
       theme_minimal() +
-      theme(axis.text.x = element_blank()) +
+      #theme(axis.text.x = element_blank()) +
       labs(title = title,
            x = col,
            y = map_col)
@@ -174,11 +174,12 @@ csd_ss_anom_nt <- function(process_output,
                                                  '\n','jaccard sim = ',jaccard_index,
                                                  '\n', 'mean = ',var_jaccard_mean,'\n','sd = ', var_jaccard_sd))) +
       scale_fill_ssdqa(palette = 'diverging', discrete = FALSE) +
-       labs(title = filtered_var,
+       labs(title = paste0('Jaccard Similarity Index for ', filtered_var, ' Concepts'),
             x = 'concept1',
-            y = 'concept2') +
-      theme_minimal() +
-      theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust=1))
+            y = 'concept2',
+            fill = 'Jaccard Index') +
+      theme_minimal() #+
+      #theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust=1))
 
     plt[["metadata"]] <- tibble('pkg_backend' = 'ggiraph',
                                 'tooltip' = TRUE)
@@ -575,7 +576,7 @@ csd_ms_anom_nt<-function(process_output,
     scale_shape_manual(values=c(19,8))+
     scale_y_discrete(labels = function(x) str_wrap(x, width = text_wrapping_char)) +
     theme_minimal() +
-    theme(axis.text.x = element_text(angle=60, hjust = 1, vjust = 1)) +
+    #theme(axis.text.x = element_text(angle=60, hjust = 1, vjust = 1)) +
     labs(y = "Concept",
          size="",
          title=paste0('Anomalous Concepts for ', filtered_var, ' per Site'),
@@ -639,7 +640,7 @@ csd_ms_anom_at <- function(process_output,
     geom_smooth(se=TRUE,alpha=0.1,linewidth=0.5, formula = y ~ x) +
     scale_color_ssdqa() +
     theme_minimal() +
-    theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust=1)) +
+    #theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust=1)) +
     labs(y = 'Proportion (Loess)',
          x = 'Time',
          title = paste0('Smoothed Proportion of ', filter_concept, ' Across Time'))
@@ -651,7 +652,7 @@ csd_ms_anom_at <- function(process_output,
     geom_line(data=allsites,linewidth=1.1) +
     geom_line(linewidth=0.2) +
     theme_minimal() +
-    theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust=1)) +
+    #theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust=1)) +
     labs(x = 'Time',
          y = 'Proportion',
          title = paste0('Proportion of ', filter_concept, ' Across Time'))
