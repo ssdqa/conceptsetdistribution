@@ -26,4 +26,5 @@ Depends:
     argos,
     R (>= 2.10),
     ssdqa.gen
+Remotes: PEDSnet/argos, ssdqa/ssdqa.gen
 LazyData: true
