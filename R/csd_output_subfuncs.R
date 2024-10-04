@@ -566,7 +566,8 @@ csd_ms_anom_nt<-function(process_output,
 
 
   plt <-
-    ggplot(dat_to_plot %>% filter(variable == filtered_var),
+    ggplot(dat_to_plot %>% filter(variable == filtered_var) %>%
+             mutate(anomaly_yn = ifelse(anomaly_yn == 'no outlier in group', 'not outlier', anomaly_yn)),
                                      #anomaly_yn != 'no outlier in group'),
               aes(x=site, y=as.character(!!sym(concept_col)), text=text, color=!!sym(comparison_col)))+
     geom_point_interactive(aes(size=mean_val,shape=anomaly_yn, tooltip = text))+
