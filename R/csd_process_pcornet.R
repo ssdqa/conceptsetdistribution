@@ -45,7 +45,6 @@
 #'         for any that are `across time`, the output is:
 #'             `site` | `time_start` | `time_increment` | `variable` | `ct_denom` | `concept_id` | `ct_concept` | `prop_concept`
 #'
-#' @export
 #'
 csd_process_pcornet <- function(cohort,
                                 domain_tbl= conceptsetdistribution::csd_domain_file,
