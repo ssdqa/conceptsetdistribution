@@ -1,9 +1,9 @@
 
-#' CSD Output
+#' Concept Set Distribution Output
 #'
 #' @param process_output the output from `csd_process`
-#' @param output_function the name of the output function that should be used provided in the `parameter_summary` csv
-#'                        file that is output to the provided results folder after running the `csd_process` function
+#' @param output_function the name of the output function that should be executed, provided in the message output
+#'                        to the console after `csd_process` has been executed
 #' @param concept_set the same concept set used in the `csd_process` function; only required if `vocab_tbl` is not NULL
 #' @param vocab_tbl OPTIONAL: the location of an external vocabulary table containing concept names for
 #'                  the provided codes. if not NULL, concept names will be available in either a reference
@@ -15,13 +15,12 @@
 #' @param filtered_var for both `single- and multi- site anomaly tests without time measurements` and
 #'                     `single- and multi- site exploratory tests with time measurements`, the variables
 #'                     to focus on
-#' @param filter_concept for @ss_anom_at, @ms_exp_at, and @ms_anom_at, the specific code that should
+#' @param filter_concept for `ss_anom_at`, `ms_exp_at`, and `ms_anom_at`, the specific code that should
 #'                       be the focus of the analysis
-#' @param facet variables to facet by; defaults to NULL
 #' @param text_wrapping_char an integer to limit the length of text on an axis before wrapping is enforced;
-#'                           used in @ms_anom_nt
-#' @param output_value the column in `process_output` that should be used in the visualization
-#'                     relevant for @ss_exp_at, @ms_anom_nt, and @ms_exp_at
+#'                           used in `ms_anom_nt`
+#' @param output_value the numerical column in `process_output` that should be used in the visualization
+#'                     relevant for `ss_exp_at`, `ms_anom_nt`, and `ms_exp_at`
 #'
 #' @return a graph to visualize the results from `csd_process` based on the parameters provided; see documentation
 #'         for individual subfunctions for details on specific output
@@ -36,12 +35,14 @@ csd_output <- function(process_output,
                        num_mappings = 10,
                        filtered_var = 'general_jia',
                        filter_concept = 81893,
-                       facet=NULL,
+                       #facet=NULL,
                        text_wrapping_char = 80,
                        output_value = 'prop_concept'){
 
   ## check concept col
   concept_col <- ifelse('concept_id' %in% colnames(process_output), 'concept_id', 'concept_code')
+
+  facet <- NULL
 
   if('concept_id' %in% colnames(process_output)){
     process_output <- process_output %>% mutate(concept_id = as.integer(concept_id))

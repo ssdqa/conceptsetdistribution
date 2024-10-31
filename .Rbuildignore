@@ -1,3 +1,5 @@
 ^conceptsetdistribution\.Rproj$
 ^\.Rproj\.user$
 ^data-raw$
+^LICENSE.txt
+^.github

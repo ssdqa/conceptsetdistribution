@@ -2,33 +2,37 @@
 
 #' Base CSD function
 #'
-#' @param cohort_codedist the cohort to pass in
-#' @param concept_set the concept set passed in through `csd_process`;
-#'                    concept set CSV file with the following columns:
-#'                    `concept_id` | `concept_code` | `concept_name` | `vocabulary_id` | `category` | `variable` | `domain`
-#'                    The variable field is required to categorize each concept set into a particular variable
-#'                    The domain is required so that the function knows which table to join to in order to derive counts
-#' @param domain_tbl domain table passed in through `csd_process`;
-#'                    tbl that is similar to the SCV check;
-#'                   four columns: `domain` | `source_col` | `concept_col` | `date_col`;
-#'                   the required columns for the csd check are only `domain_tbl`, `concept_col`, `date_col`
+#' @param cohort_codedist the cohort of interest
+#' @param concept_set an annotated concept set CSV file with the following columns:
+#' - `concept_id` required for OMOP; the concept_id of interest
+#' - `concept_code` required for PCORnet; the code of interest
+#' - `concept_name` optional; the descriptive name of the concept
+#' - `vocabulary_id` required for PCORnet; the vocabulary of the code - should match what is listed in the domain table's vocabulary_field
+#' - `variable` required; a string label grouping one concept code into a larger variable definition
+#' - `domain` required; the name of the CDM table where the concept is stored - multiple domains can be included in the file, but only one domain should be listed per row
+#' @param domain_tbl input table defining the domains listed in the annotated concept set
+#'                   four columns:
+#'                   - `domain` the name of the CDM table associated with the concept; should match what is listed in the annotated concept set
+#'                   - `concept_field` the name of the field in the domain table where the concepts are located
+#'                   - `date_field` the name of the field in the domain table with the date that should be used for time-based filtering
+#'                   - `vocabulary_field` PCORnet only; set to NA
 #' @param time logical to determine whether to output the check across time
-#' @param time_span when `time = TRUE`, a vector of two dates for the observation period of the study
+#' @param time_span when time = TRUE, a vector of two dates for the observation period of the study
 #' @param time_period when time = TRUE, this argument defines the distance between dates within the specified time period. defaults
 #'                    to `year`, but other time periods such as `month` or `week` are also acceptable
 #'
-#' @return returns variable and their concept mappings, both in counts and in proportions;
-#'         when `time = TRUE`, then output is given across time, and proportions computed within each variable
+#' @return returns variable and its concept mappings, both in counts and in proportions;
+#'         when time = TRUE, then output is given across time, and proportions computed within each variable
 #'
 #' @import dplyr
 #' @importFrom purrr reduce
 #'
-check_code_dist_csd <- function(cohort_codedist,
-                                concept_set,
-                                time = FALSE,
-                                time_span,
-                                time_period,
-                                domain_tbl = conceptsetdistribution::csd_domain_file){
+check_code_dist_csd_omop <- function(cohort_codedist,
+                                     concept_set,
+                                     time = FALSE,
+                                     time_span,
+                                     time_period,
+                                     domain_tbl = conceptsetdistribution::csd_domain_file){
 
 
   domain_filter <-
@@ -140,12 +144,12 @@ check_code_dist_csd <- function(cohort_codedist,
 #'
 #' @importFrom stats setNames
 #'
-check_code_dist_ssanom <- function(cohort_codedist,
-                                   concept_set,
-                                   num_concept_combined = FALSE,
-                                   num_concept_1 = 30,
-                                   num_concept_2 = 30,
-                                   domain_tbl = conceptsetdistribution::csd_domain_file){
+check_code_dist_ssanom_omop <- function(cohort_codedist,
+                                        concept_set,
+                                        num_concept_combined = FALSE,
+                                        num_concept_1 = 30,
+                                        num_concept_2 = 30,
+                                        domain_tbl = conceptsetdistribution::csd_domain_file){
 
 
   domain_filter <-

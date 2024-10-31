@@ -1,6 +1,6 @@
 
 
-#' Concept Set Distribution - PCORnet Version
+#' Concept Set Distribution - OMOP Version
 #'
 #' @param cohort cohort for SSDQA testing; required fields:
 #' - `site`
@@ -12,7 +12,7 @@
 #'                   - `domain` the name of the CDM table associated with the concept; should match what is listed in the annotated concept set
 #'                   - `concept_field` the name of the field in the domain table where the concepts are located
 #'                   - `date_field` the name of the field in the domain table with the date that should be used for time-based filtering
-#'                   - `vocabulary_field` PCORnet only; the field in the domain table where the vocabulary of the code is stored (i.e. dx_type)
+#'                   - `vocabulary_field` PCORnet only; set to NA
 #'
 #' @param concept_set an annotated concept set CSV file with the following columns:
 #' - `concept_id` required for OMOP; the concept_id of interest
@@ -49,20 +49,24 @@
 #'
 #' @return a dataframe summarizing the distribution of code usage for each user defined variable
 #'
+#' @import argos
+#' @import ssdqa.gen
+#' @importFrom stringr str_wrap
 #'
-csd_process_pcornet <- function(cohort,
-                                domain_tbl= conceptsetdistribution::csd_domain_file,
-                                concept_set = conceptsetdistribution::csd_concept_set,
-                                multi_or_single_site = 'single',
-                                anomaly_or_exploratory='exploratory',
-                                num_concept_combined = FALSE,
-                                num_concept_1 = 30,
-                                num_concept_2 = 30,
-                                p_value = 0.9,
-                                age_groups = FALSE, #read_codeset('age_group_definitions'),
-                                time = TRUE,
-                                time_span = c('2012-01-01', '2020-01-01'),
-                                time_period = 'year'
+#'
+csd_process_omop <- function(cohort,
+                             domain_tbl= conceptsetdistribution::csd_domain_file,
+                             concept_set = conceptsetdistribution::csd_concept_set,
+                             multi_or_single_site = 'single',
+                             anomaly_or_exploratory='exploratory',
+                             num_concept_combined = FALSE,
+                             num_concept_1 = 30,
+                             num_concept_2 = 30,
+                             p_value = 0.9,
+                             age_groups = FALSE, #read_codeset('age_group_definitions'),
+                             time = TRUE,
+                             time_span = c('2012-01-01', '2020-01-01'),
+                             time_period = 'year'
 ){
 
   ## parameter summary output
@@ -70,9 +74,8 @@ csd_process_pcornet <- function(cohort,
   #                                            as.list(environment())))
 
   # Add site check
-  site_filter <- check_site_type_pcnt(cohort = cohort,
+  site_filter <- check_site_type(cohort = cohort,
                                  multi_or_single_site = multi_or_single_site)
-                                 #site_list = site_list)
   cohort_filter <- site_filter$cohort
   grouped_list <- site_filter$grouped_list
   site_col <- site_filter$grouped_list
@@ -80,16 +83,13 @@ csd_process_pcornet <- function(cohort,
 
   # Set up grouped list
 
-  #grouped_list <- grouped_list %>% append('domain')
-
   if(is.data.frame(age_groups)){grouped_list <- grouped_list %>% append('age_grp')}
 
   site_output <- list()
 
   # Prep cohort
 
-  cohort_prep <- prepare_cohort_pcnt(cohort_tbl = cohort_filter, age_groups = age_groups, codeset = NULL) %>%
-    #mutate(domain = code_domain) %>%
+  cohort_prep <- prepare_cohort(cohort_tbl = cohort_filter, age_groups = age_groups, codeset = NULL) %>%
     group_by(!!! syms(grouped_list))
 
   # Execute function
@@ -104,19 +104,19 @@ csd_process_pcornet <- function(cohort,
       cohort_site <- cohort_prep %>% filter(!!sym(site_col)%in%c(site_list_thisrnd))
 
       if(multi_or_single_site=='single' & anomaly_or_exploratory=='anomaly') {
-        variable_compute <- check_code_dist_ssanom_pcnt(cohort_codedist = cohort_site,
-                                                   concept_set = concept_set,
-                                                   domain_tbl = domain_tbl,
-                                                   num_concept_combined = num_concept_combined,
-                                                   num_concept_1 = num_concept_1,
-                                                   num_concept_2 = num_concept_2)
+        variable_compute <- check_code_dist_ssanom_omop(cohort_codedist = cohort_site,
+                                                        concept_set = concept_set,
+                                                        domain_tbl = domain_tbl,
+                                                        num_concept_combined = num_concept_combined,
+                                                        num_concept_1 = num_concept_1,
+                                                        num_concept_2 = num_concept_2)
       } else {
-        variable_compute <- check_code_dist_csd_pcnt(cohort_codedist = cohort_site,
-                                                concept_set = concept_set,
-                                                time = time,
-                                                time_span = time_span,
-                                                time_period = time_period,
-                                                domain_tbl = domain_tbl)
+        variable_compute <- check_code_dist_csd_omop(cohort_codedist = cohort_site,
+                                                     concept_set = concept_set,
+                                                     time = time,
+                                                     time_span = time_span,
+                                                     time_period = time_period,
+                                                     domain_tbl = domain_tbl)
       }
 
 
@@ -125,23 +125,28 @@ csd_process_pcornet <- function(cohort,
     }
 
     csd_tbl <- reduce(.x=site_output,
-                      .f=dplyr::union) %>% replace_site_col()
+                      .f=dplyr::union)
 
     if(multi_or_single_site == 'multi' & anomaly_or_exploratory == 'anomaly'){
 
       csd_tbl_int <- compute_dist_anomalies(df_tbl = csd_tbl,
-                                            grp_vars = c('variable', 'concept_code'),
-                                            var_col = 'prop_concept')
+                                            grp_vars = c('variable', 'concept_id'),
+                                            var_col = 'prop_concept',
+                                            denom_cols = c('variable', 'ct_denom'))
 
       csd_tbl_final <- detect_outliers(df_tbl = csd_tbl_int,
                                        tail_input = 'both',
                                        p_input = p_value,
                                        column_analysis = 'prop_concept',
-                                       column_variable = 'concept_code')
+                                       column_variable = 'concept_id')
 
     }else{csd_tbl_final <- csd_tbl}
 
   } else {
+
+
+    cohort_prep <- prepare_cohort(cohort_tbl = cohort_filter, age_groups = age_groups, codeset = NULL) %>%
+      group_by(!!! syms(grouped_list))
 
     csd_tbl <- compute_fot(cohort = cohort_prep,
                            site_list = site_list_adj,
@@ -150,20 +155,20 @@ csd_process_pcornet <- function(cohort,
                            time_period = time_period,
                            reduce_id = NULL,
                            check_func = function(dat){
-                             check_code_dist_csd_pcnt(cohort_codedist = dat,
-                                             concept_set = concept_set,
-                                             #code_type = code_type,
-                                             #code_domain = code_domain,
-                                             domain_tbl = domain_tbl,
-                                             time = TRUE)
-                           }) %>% replace_site_col()
+                             check_code_dist_csd_omop(cohort_codedist = dat,
+                                                      concept_set = concept_set,
+                                                      domain_tbl = domain_tbl,
+                                                      time = TRUE,
+                                                      time_span = time_span,
+                                                      time_period = time_period)
+                           })
 
     if(multi_or_single_site == 'multi' & anomaly_or_exploratory=='anomaly') {
 
-      lookup <- csd_tbl %>% ungroup() %>% distinct(variable, concept_code)
+      lookup <- csd_tbl %>% ungroup() %>% distinct(variable, concept_id)
 
       csd_tbl_ms <- ms_anom_euclidean(fot_input_tbl = csd_tbl,
-                                      grp_vars = c('site', 'concept_code'),
+                                      grp_vars = c('site', 'concept_id'),
                                       var_col = 'prop_concept')
 
       csd_tbl_final <- csd_tbl_ms %>% left_join(lookup)
@@ -171,7 +176,7 @@ csd_process_pcornet <- function(cohort,
     }else if(multi_or_single_site == 'single' & anomaly_or_exploratory=='anomaly'){
 
       csd_tbl_ss <- anomalize_ss_anom_at(fot_input_tbl = csd_tbl,
-                                         grp_vars = 'concept_code',
+                                         grp_vars = 'concept_id',
                                          time_var = 'time_start',
                                          var_col = 'prop_concept')
 

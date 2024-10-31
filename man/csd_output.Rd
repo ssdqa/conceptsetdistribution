@@ -2,7 +2,7 @@
 % Please edit documentation in R/csd_output.R
 \name{csd_output}
 \alias{csd_output}
-\title{CSD Output}
+\title{Concept Set Distribution Output}
 \usage{
 csd_output(
   process_output,
@@ -13,7 +13,6 @@ csd_output(
   num_mappings = 10,
   filtered_var = "general_jia",
   filter_concept = 81893,
-  facet = NULL,
   text_wrapping_char = 80,
   output_value = "prop_concept"
 )
@@ -21,8 +20,8 @@ csd_output(
 \arguments{
 \item{process_output}{the output from \code{csd_process}}
 
-\item{output_function}{the name of the output function that should be used provided in the \code{parameter_summary} csv
-file that is output to the provided results folder after running the \code{csd_process} function}
+\item{output_function}{the name of the output function that should be executed, provided in the message output
+to the console after \code{csd_process} has been executed}
 
 \item{concept_set}{the same concept set used in the \code{csd_process} function; only required if \code{vocab_tbl} is not NULL}
 
@@ -40,21 +39,19 @@ will pick based on the highest count of the most commonly appearing variables;}
 \verb{single- and multi- site exploratory tests with time measurements}, the variables
 to focus on}
 
-\item{filter_concept}{for @ss_anom_at, @ms_exp_at, and @ms_anom_at, the specific code that should
+\item{filter_concept}{for \code{ss_anom_at}, \code{ms_exp_at}, and \code{ms_anom_at}, the specific code that should
 be the focus of the analysis}
 
-\item{facet}{variables to facet by; defaults to NULL}
-
 \item{text_wrapping_char}{an integer to limit the length of text on an axis before wrapping is enforced;
-used in @ms_anom_nt}
+used in \code{ms_anom_nt}}
 
-\item{output_value}{the column in \code{process_output} that should be used in the visualization
-relevant for @ss_exp_at, @ms_anom_nt, and @ms_exp_at}
+\item{output_value}{the numerical column in \code{process_output} that should be used in the visualization
+relevant for \code{ss_exp_at}, \code{ms_anom_nt}, and \code{ms_exp_at}}
 }
 \value{
 a graph to visualize the results from \code{csd_process} based on the parameters provided; see documentation
 for individual subfunctions for details on specific output
 }
 \description{
-CSD Output
+Concept Set Distribution Output
 }

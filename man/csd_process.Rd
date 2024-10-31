@@ -2,12 +2,13 @@
 % Please edit documentation in R/csd_process.R
 \name{csd_process}
 \alias{csd_process}
-\title{CSD Process function}
+\title{Concept Set Distribution}
 \usage{
 csd_process(
   cohort,
   domain_tbl = conceptsetdistribution::csd_domain_file,
   concept_set = conceptsetdistribution::csd_concept_set,
+  omop_or_pcornet,
   multi_or_single_site = "single",
   anomaly_or_exploratory = "exploratory",
   num_concept_combined = FALSE,
@@ -15,78 +16,85 @@ csd_process(
   num_concept_2 = 30,
   p_value = 0.9,
   age_groups = FALSE,
-  time = TRUE,
+  time = FALSE,
   time_span = c("2012-01-01", "2020-01-01"),
   time_period = "year"
 )
 }
 \arguments{
 \item{cohort}{cohort for SSDQA testing; required fields:
-\code{site} | \code{person_id} | \code{start_date} | \code{end_date} where start and end date}
+\itemize{
+\item \code{site}
+\item \code{person_id}
+\item \code{start_date}
+\item \code{end_date}
+}}
 
-\item{domain_tbl}{tbl that is similar to the SCV check;
-four columns: \code{domain} | \code{concept_field} | \code{date_field} | \code{vocabulary_field}
+\item{domain_tbl}{input table defining the domains listed in the annotated concept set
+four columns:
+- \code{domain} the name of the CDM table associated with the concept; should match what is listed in the annotated concept set
+- \code{concept_field} the name of the field in the domain table where the concepts are located
+- \code{date_field} the name of the field in the domain table with the date that should be used for time-based filtering
+- \code{vocabulary_field} PCORnet only; set to NA}
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{              the vocabulary_field column is only required for the PCORnet CDM
-}\if{html}{\out{</div>}}}
+\item{concept_set}{an annotated concept set CSV file with the following columns:
+\itemize{
+\item \code{concept_id} required for OMOP; the concept_id of interest
+\item \code{concept_code} required for PCORnet; the code of interest
+\item \code{concept_name} optional; the descriptive name of the concept
+\item \code{vocabulary_id} required for PCORnet; the vocabulary of the code - should match what is listed in the domain table's vocabulary_field
+\item \code{variable} required; a string label grouping one concept code into a larger variable definition
+\item \code{domain} required; the name of the CDM table where the concept is stored - multiple domains can be included in the file, but only one domain should be listed per row
+}}
 
-\item{concept_set}{concept set CSV file with the following columns:
-\code{concept_id} | \code{concept_code} | \code{concept_name} | \code{vocabulary_id} | \code{variable} | \code{domain}
-The variable field is required to categorize each concept set into a particular variable
-The domain is required so that the function knows which table to join to in order to derive counts}
+\item{omop_or_pcornet}{Option to run the function using the OMOP or PCORnet CDM as the default CDM
+\itemize{
+\item \code{omop}: run the \code{\link[=csd_process_omop]{csd_process_omop()}} function against an OMOP CDM instance
+\item \code{pcornet}: run the \code{\link[=csd_process_pcornet]{csd_process_pcornet()}} function against a PCORnet CDM instance
+}}
 
-\item{multi_or_single_site}{direction to determine what kind of check to run
-string that is either \code{multi} or \code{single}}
+\item{multi_or_single_site}{Option to run the function on a single vs multiple sites
+\itemize{
+\item \code{single}: run the function for a single site
+\item \code{multi}: run the function for multiple sites
+}}
 
-\item{anomaly_or_exploratory}{direction to determine what kind of check to run; a string
-that is either \code{anomaly} or \code{exploratory}}
+\item{anomaly_or_exploratory}{Option to conduct an exploratory or anomaly detection analysis. Exploratory analyses give a high
+level summary of the data to examine the fact representation within the cohort. Anomaly detection
+analyses are specialized to identify outliers within the cohort.}
 
-\item{num_concept_combined}{when \code{mult_or_single_site} = \code{single} and \code{anomaly_or_exploratory} = \code{anomaly},
-this argument is an integer and will ensure that \code{concept1} and \code{concept2} meet
-some minimal threshold for including in the jaccard index; if \code{TRUE}, then
-\emph{both} conditions for \code{num_concept_1} and \code{num_concept_2} should be met;
-if \code{FALSE} then just one condition needs to be met.}
+\item{num_concept_combined}{when \code{multi_or_single_site} = \code{single} and \code{anomaly_or_exploratory} = \code{anomaly},
+this argument is a boolean that will ensure that \code{concept1} and \code{concept2} meet some minimal threshold for including in the jaccard index
+if \code{TRUE}, then \emph{both} conditions for \code{num_concept_1} and \code{num_concept_2} should be met; if \code{FALSE} then just one condition needs to be met.}
 
-\item{num_concept_1}{when \code{mult_or_single_site} = \code{single} and \code{anomaly_or_exploratory} = \code{anomaly},
-this argument is an integer and requires a minimum number of times that
-the \emph{first} concept appears in the dataset}
+\item{num_concept_1}{when \code{multi_or_single_site} = \code{single} and \code{anomaly_or_exploratory} = \code{anomaly},
+this argument is an integer and requires a minimum number of times that the \emph{first} concept appears in the dataset}
 
-\item{num_concept_2}{when \code{mult_or_single_site} = \code{single} and \code{anomaly_or_exploratory} = \code{anomaly},
-this argument is an integer and requires a minimum number of times that
-the \emph{second} concept appears in the dataset}
+\item{num_concept_2}{when \code{multi_or_single_site} = \code{single} and \code{anomaly_or_exploratory} = \code{anomaly},
+this argument is an integer and requires a minimum number of times that the \emph{second} concept appears in the dataset}
 
 \item{p_value}{the p value to be used as a threshold in the multi-site anomaly detection analysis}
 
-\item{age_groups}{If you would like to stratify the results by age group, fill out the provided \code{age_group_definitions.csv} file
-with the following information:
-- @min_age: the minimum age for the group (i.e. 10)
-- @max_age: the maximum age for the group (i.e. 20)
-- @group: a string label for the group (i.e. 10-20, Young Adult, etc.)
+\item{age_groups}{If you would like to stratify the results by age group,  create a table or CSV file with the following
+columns and include it as the \code{age_groups} function parameter:
+\itemize{
+\item \code{min_age}: the minimum age for the group (i.e. 10)
+\item \code{max_age}: the maximum age for the group (i.e. 20)
+\item \code{group}: a string label for the group (i.e. 10-20, Young Adult, etc.)
+}
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{                Then supply this csv file as the age_groups argument (i.e. read.csv('path/to/age_group_definitions.csv'))
-
-                If you would not like to stratify by age group, leave the argument as NULL
-}\if{html}{\out{</div>}}}
+If you would \emph{not} like to stratify by age group, leave the argument as NULL}
 
 \item{time}{logical to determine whether to output the check across time}
 
-\item{time_span}{when \code{time = TRUE}, a vector of two dates for the observation period of the study}
+\item{time_span}{when time = TRUE, a vector of two dates for the observation period of the study}
 
 \item{time_period}{when time = TRUE, this argument defines the distance between dates within the specified time period. defaults
 to \code{year}, but other time periods such as \code{month} or \code{week} are also acceptable}
 }
 \value{
-for \verb{single- and multi-} and \code{exploratory} analyses, the output is:
-\code{site} | \code{variable} | \code{ct_denom} | \code{concept_id} | \code{ct_concept} | \code{prop_concept}
-for \code{single} and \code{anomaly} analyses, the output is:
-\code{site} | \code{concept1}| \code{concept2}| \code{cocount}| \code{concept1_ct} | \code{concept2_ct} | \code{concept_count_union} |\code{jaccard_index} |
-\code{concept1_prop} | \code{concept2_prop} | \code{variable} |
-where \code{concept_count_union} is how often a pair of codes appear in the full dataset
-and \code{concept1_ct} and \code{concept2_ct} are how often each appear in the dataset
-for any that are \verb{across time}, the output is:
-\code{site} | \code{time_start} | \code{time_increment} | \code{variable} | \code{ct_denom} | \code{concept_id} | \code{ct_concept} | \code{prop_concept}
+a dataframe summarizing the distribution of code usage for each user defined variable
 }
 \description{
-add csv output of main table and csv output of param summary
-(that function needs updating to be more generalizable)
+Concept Set Distribution
 }
