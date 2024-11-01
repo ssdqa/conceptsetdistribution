@@ -144,10 +144,6 @@ csd_process_omop <- function(cohort,
 
   } else {
 
-
-    cohort_prep <- prepare_cohort(cohort_tbl = cohort_filter, age_groups = age_groups, codeset = NULL) %>%
-      group_by(!!! syms(grouped_list))
-
     csd_tbl <- compute_fot(cohort = cohort_prep,
                            site_list = site_list_adj,
                            site_col = site_col,

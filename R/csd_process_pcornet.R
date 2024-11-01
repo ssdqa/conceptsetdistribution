@@ -70,17 +70,14 @@ csd_process_pcornet <- function(cohort,
   #                                            as.list(environment())))
 
   # Add site check
-  site_filter <- check_site_type_pcnt(cohort = cohort,
+  site_filter <- check_site_type(cohort = cohort,
                                  multi_or_single_site = multi_or_single_site)
-                                 #site_list = site_list)
   cohort_filter <- site_filter$cohort
   grouped_list <- site_filter$grouped_list
   site_col <- site_filter$grouped_list
   site_list_adj <- site_filter$site_list_adj
 
   # Set up grouped list
-
-  #grouped_list <- grouped_list %>% append('domain')
 
   if(is.data.frame(age_groups)){grouped_list <- grouped_list %>% append('age_grp')}
 
@@ -89,7 +86,6 @@ csd_process_pcornet <- function(cohort,
   # Prep cohort
 
   cohort_prep <- prepare_cohort_pcnt(cohort_tbl = cohort_filter, age_groups = age_groups, codeset = NULL) %>%
-    #mutate(domain = code_domain) %>%
     group_by(!!! syms(grouped_list))
 
   # Execute function
@@ -105,18 +101,18 @@ csd_process_pcornet <- function(cohort,
 
       if(multi_or_single_site=='single' & anomaly_or_exploratory=='anomaly') {
         variable_compute <- check_code_dist_ssanom_pcnt(cohort_codedist = cohort_site,
-                                                   concept_set = concept_set,
-                                                   domain_tbl = domain_tbl,
-                                                   num_concept_combined = num_concept_combined,
-                                                   num_concept_1 = num_concept_1,
-                                                   num_concept_2 = num_concept_2)
+                                                        concept_set = concept_set,
+                                                        domain_tbl = domain_tbl,
+                                                        num_concept_combined = num_concept_combined,
+                                                        num_concept_1 = num_concept_1,
+                                                        num_concept_2 = num_concept_2)
       } else {
         variable_compute <- check_code_dist_csd_pcnt(cohort_codedist = cohort_site,
-                                                concept_set = concept_set,
-                                                time = time,
-                                                time_span = time_span,
-                                                time_period = time_period,
-                                                domain_tbl = domain_tbl)
+                                                     concept_set = concept_set,
+                                                     time = time,
+                                                     time_span = time_span,
+                                                     time_period = time_period,
+                                                     domain_tbl = domain_tbl)
       }
 
 
@@ -125,13 +121,14 @@ csd_process_pcornet <- function(cohort,
     }
 
     csd_tbl <- reduce(.x=site_output,
-                      .f=dplyr::union) %>% replace_site_col()
+                      .f=dplyr::union)
 
     if(multi_or_single_site == 'multi' & anomaly_or_exploratory == 'anomaly'){
 
       csd_tbl_int <- compute_dist_anomalies(df_tbl = csd_tbl,
                                             grp_vars = c('variable', 'concept_code'),
-                                            var_col = 'prop_concept')
+                                            var_col = 'prop_concept',
+                                            denom_cols = c('variable', 'ct_denom'))
 
       csd_tbl_final <- detect_outliers(df_tbl = csd_tbl_int,
                                        tail_input = 'both',
@@ -151,12 +148,12 @@ csd_process_pcornet <- function(cohort,
                            reduce_id = NULL,
                            check_func = function(dat){
                              check_code_dist_csd_pcnt(cohort_codedist = dat,
-                                             concept_set = concept_set,
-                                             #code_type = code_type,
-                                             #code_domain = code_domain,
-                                             domain_tbl = domain_tbl,
-                                             time = TRUE)
-                           }) %>% replace_site_col()
+                                                      concept_set = concept_set,
+                                                      domain_tbl = domain_tbl,
+                                                      time = TRUE,
+                                                      time_span = time_span,
+                                                      time_period = time_period)
+                           })
 
     if(multi_or_single_site == 'multi' & anomaly_or_exploratory=='anomaly') {
 
