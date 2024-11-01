@@ -126,6 +126,7 @@ csd_ss_exp_nt <- function(process_output,
 #'         mean jaccard score for the variable, and concepts will show.
 #'
 csd_ss_anom_nt <- function(process_output,
+                           concept_col,
                            vocab_tbl = vocabulary_tbl('concept'),
                            filtered_var = 'general_jia'){
 
@@ -152,12 +153,14 @@ csd_ss_anom_nt <- function(process_output,
   ## Join to vocab
   firstcolnames <- join_to_vocabulary(tbl = process_output,
                                       vocab_tbl = vocab_tbl,
-                                      col = 'concept1') %>%
+                                      col = 'concept1',
+                                      vocab_col = concept_col) %>%
     rename(conceptname1=concept_name) %>% select(concept1, conceptname1)
 
   secondcolnames <- join_to_vocabulary(tbl = process_output,
                                        vocab_tbl = vocab_tbl,
-                                       col = 'concept2') %>%
+                                       col = 'concept2',
+                                       vocab_col = concept_col) %>%
     rename(conceptname2=concept_name) %>% select(concept2, conceptname2)
 
   final <-

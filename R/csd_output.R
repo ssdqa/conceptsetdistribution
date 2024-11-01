@@ -50,12 +50,17 @@ csd_output <- function(process_output,
 
   ## Get concept names from vocabulary table
   if(output_function != 'csd_ss_anom_nt'){
-    process_output <- join_to_vocabulary(tbl = process_output %>%
-                                           inner_join(select(concept_set, concept_id, concept_code,
-                                                             vocabulary_id)),
-                                         vocab_tbl = vocab_tbl,
-                                         col = concept_col,
-                                         vocab_col = concept_col)
+
+    if(is.null(concept_set)){
+      process_output <- process_output
+    }else{
+      process_output <- process_output %>% inner_join(concept_set)
+    }
+
+      process_output <- join_to_vocabulary(tbl = process_output,
+                                           vocab_tbl = vocab_tbl,
+                                           col = concept_col,
+                                           vocab_col = concept_col)
   }
 
   ## Run output functions
@@ -66,6 +71,7 @@ csd_output <- function(process_output,
                                 num_mappings = num_mappings)
   }else if(output_function == 'csd_ss_anom_nt'){
     csd_output <- csd_ss_anom_nt(process_output,
+                                 concept_col = concept_col,
                                  vocab_tbl = vocab_tbl,
                                  filtered_var = filtered_var)
   }else if(output_function == 'csd_ss_exp_at'){
