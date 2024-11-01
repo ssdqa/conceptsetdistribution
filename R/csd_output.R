@@ -29,7 +29,7 @@
 #'
 csd_output <- function(process_output,
                        output_function,
-                       concept_set = conceptsetdistribution::csd_concept_set,
+                       concept_set = NULL,
                        vocab_tbl = vocabulary_tbl('concept'),
                        num_variables = 10,
                        num_mappings = 10,
@@ -42,7 +42,7 @@ csd_output <- function(process_output,
   ## check concept col
   concept_col <- ifelse('concept_id' %in% colnames(process_output), 'concept_id', 'concept_code')
 
-  facet <- NULL
+  if('age_grp' %in% colnames(process_output)){facet <- 'age_grp'}else{facet <- NULL}
 
   if('concept_id' %in% colnames(process_output)){
     process_output <- process_output %>% mutate(concept_id = as.integer(concept_id))

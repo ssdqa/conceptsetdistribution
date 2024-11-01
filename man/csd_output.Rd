@@ -7,7 +7,7 @@
 csd_output(
   process_output,
   output_function,
-  concept_set = conceptsetdistribution::csd_concept_set,
+  concept_set = NULL,
   vocab_tbl = vocabulary_tbl("concept"),
   num_variables = 10,
   num_mappings = 10,

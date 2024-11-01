@@ -39,13 +39,13 @@ check_code_dist_csd_pcnt <- function(cohort_codedist,
 
     dates <- domain_filter$date_field[[i]]
 
-    domain_tbl_name <- domain_filter[i,]$domain %>% pull
+    domain_tbl_name <- domain_filter$domain[[i]]
     domain_tbl_cdm <- cohort_codedist %>%
       inner_join(cdm_tbl(domain_tbl_name)) %>%
       filter(!!sym(dates) >= start_date,
              !!sym(dates) <= end_date)
-    final_col <- domain_filter[i,]$concept_field
-    vocab_col <- domain_filter[i,]$vocabulary_field
+    final_col <- domain_filter$concept_field[[i]]
+    vocab_col <- domain_filter$vocabulary_field[[i]]
 
     join_cols <- set_names('concept_code', final_col)
 
@@ -183,14 +183,15 @@ check_code_dist_ssanom_pcnt <- function(cohort_codedist,
           filter(domain == domain_name) %>%
           select(date_field) %>% pull()
 
-        vocab_col <-
-          domain_filter %>%
-          filter(domain == domain_name) %>%
-          select(vocabulary_field) %>% pull()
-
         join_cols <- set_names('concept_code', final_col)
 
         if(!is.na(vocabulary_col)){
+
+          vocab_col <-
+            domain_filter %>%
+            filter(domain == domain_name) %>%
+            select(vocabulary_field) %>% pull()
+
           join_cols2 <- set_names('vocabulary_id', vocab_col)
           join_cols <- join_cols %>% append(join_cols2)
         }

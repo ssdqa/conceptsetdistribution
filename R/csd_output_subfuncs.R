@@ -93,8 +93,9 @@ csd_ss_exp_nt <- function(process_output,
       theme_minimal() +
       #theme(axis.text.x = element_blank()) +
       labs(title = title,
-           x = col,
-           y = map_col)
+           x = '',
+           y = map_col,
+           fill = 'Proportion')
 
     plt[["metadata"]] <- tibble('pkg_backend' = 'ggiraph',
                                  'tooltip' = TRUE)
@@ -371,7 +372,9 @@ csd_ss_exp_at <- function(process_output,
     geom_line() +
     facet_wrap((facet)) +
     labs(title = paste0('Top ', num_mappings, ' Concepts for ', filtered_var, ' Over Time'),
-         color = col) +
+         color = col,
+         y = 'Proportion',
+         x = 'Time') +
     theme_minimal() +
     scale_color_ssdqa()
 
@@ -447,7 +450,9 @@ csd_ms_exp_at <- function(process_output,
     geom_line() +
     facet_wrap((facet)) +
     labs(title = paste0('Concepts per Site Over Time'),
-         color = 'Site') +
+         color = 'Site',
+         y = 'Proportion',
+         x = 'Time') +
     theme_minimal() +
     scale_color_ssdqa()
 
