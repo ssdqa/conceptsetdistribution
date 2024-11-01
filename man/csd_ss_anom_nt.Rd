@@ -6,12 +6,16 @@
 \usage{
 csd_ss_anom_nt(
   process_output,
+  concept_col,
   vocab_tbl = vocabulary_tbl("concept"),
   filtered_var = "general_jia"
 )
 }
 \arguments{
 \item{process_output}{the output from \code{csd_process}}
+
+\item{concept_col}{the name of the column from the concept_set used to identify concepts
+should be either \code{concept_id} or \code{concept_code}}
 
 \item{vocab_tbl}{OPTIONAL: the location of an external vocabulary table containing concept names for
 the provided codes. if not NULL, concept names will be available in either a reference

@@ -28,3 +28,10 @@ Depends:
     ssdqa.gen
 Remotes: PEDSnet/argos, ssdqa/ssdqa.gen
 LazyData: true
+Suggests: 
+    DBI,
+    readr,
+    rlang,
+    RSQLite,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

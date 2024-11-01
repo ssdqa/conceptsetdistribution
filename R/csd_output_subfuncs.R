@@ -116,6 +116,8 @@ csd_ss_exp_nt <- function(process_output,
 #'
 #'
 #' @param process_output the output from `csd_process`
+#' @param concept_col the name of the column from the concept_set used to identify concepts
+#'                    should be either `concept_id` or `concept_code`
 #' @param vocab_tbl OPTIONAL: the location of an external vocabulary table containing concept names for
 #'                  the provided codes. if not NULL, concept names will be available in either a reference
 #'                  table or in a hover tooltip
