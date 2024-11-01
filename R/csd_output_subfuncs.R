@@ -519,7 +519,8 @@ csd_ms_exp_nt <- function(process_output,
     select(-denom) %>%
     mutate(pct = !!sym(prop)) %>%
     arrange(!!!syms(facet), desc(ct)) %>%
-    relocate(site) %>%
+    #relocate(site) %>%
+    select(!!!syms(facet), variable, !!sym(map_col), concept_name, !!sym(ct), !!sym(prop), pct) %>%
     gt::gt() %>%
     cols_nanoplot(columns = pct, plot_type = 'bar',
                   autohide = TRUE, new_col_label = 'percent') %>%
