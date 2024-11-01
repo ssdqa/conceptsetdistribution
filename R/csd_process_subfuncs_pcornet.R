@@ -185,15 +185,16 @@ check_code_dist_ssanom_pcnt <- function(cohort_codedist,
 
         join_cols <- set_names('concept_code', final_col)
 
-        if(!is.na(vocabulary_col)){
+        vocab_col <-
+          domain_filter %>%
+          filter(domain == domain_name) %>%
+          select(vocabulary_field) %>% pull()
 
-          vocab_col <-
-            domain_filter %>%
-            filter(domain == domain_name) %>%
-            select(vocabulary_field) %>% pull()
+        if(!is.na(vocab_col)){
 
           join_cols2 <- set_names('vocabulary_id', vocab_col)
           join_cols <- join_cols %>% append(join_cols2)
+
         }
 
         one_domain_tbl <-
