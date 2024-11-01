@@ -4,7 +4,7 @@
 #'
 #' @param cohort cohort for SSDQA testing; required fields:
 #' - `site`
-#' - `person_id`
+#' - `patid`
 #' - `start_date`
 #' - `end_date`
 #' @param domain_tbl input table defining the domains listed in the annotated concept set

@@ -24,7 +24,7 @@ csd_process_pcornet(
 \item{cohort}{cohort for SSDQA testing; required fields:
 \itemize{
 \item \code{site}
-\item \code{person_id}
+\item \code{patid}
 \item \code{start_date}
 \item \code{end_date}
 }}
