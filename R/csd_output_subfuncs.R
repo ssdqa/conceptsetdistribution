@@ -19,7 +19,7 @@
 NULL
 
 
-#' *Single Site, Exploratory, No Time*
+#' *Single Site, Exploratory, Cross-Sectional*
 #'
 #'
 #' @param process_output the output from `csd_process`
@@ -35,7 +35,7 @@ NULL
 #'        with proportion for each concept.
 #'        2) a table with each mapping and the total variable count
 #'
-csd_ss_exp_nt <- function(process_output,
+csd_ss_exp_cs <- function(process_output,
                           concept_col,
                           facet = NULL,
                           num_codes = 10,
@@ -112,7 +112,7 @@ csd_ss_exp_nt <- function(process_output,
 }
 
 
-#' *Single Site, Anomaly, No Time*
+#' *Single Site, Anomaly, Cross-Sectional*
 #'
 #'
 #' @param process_output the output from `csd_process`
@@ -123,14 +123,12 @@ csd_ss_exp_nt <- function(process_output,
 #'                  table or in a hover tooltip
 #' @param filtered_var the variable to perform the jaccard similarity index for
 #'
-#' @return for a given variable, a heatmap of the jaccard index for each concept pair;
-#'         if the user hovers over the heatmap, the co-occurrence count, jaccard score for the pair,
-#'         mean jaccard score for the variable, and concepts will show.
+#' @return for a given variable, a heatmap of the jaccard index for each concept pair
 #'
-csd_ss_anom_nt <- function(process_output,
+csd_ss_anom_cs <- function(process_output,
                            concept_col,
-                           vocab_tbl = vocabulary_tbl('concept'),
-                           filtered_var = 'general_jia'){
+                           vocab_tbl = NULL,
+                           filtered_var){
 
   ## Check for limit
   var_ct <- process_output %>%
@@ -195,10 +193,7 @@ csd_ss_anom_nt <- function(process_output,
 
 ### ACROSS TIME
 
-#' *Single Site, Anomaly, Across Time*
-#'
-#' Control chart looking at number of mappings over time
-#'
+#' *Single Site, Anomaly, Longitudinal*
 #'
 #' @param process_output dataframe output by `csd_process`
 #' @param concept_col the name of the column from the concept_set used to identify concepts
@@ -214,10 +209,10 @@ csd_ss_anom_nt <- function(process_output,
 #'         conducted and outliers are marked with red dots. the graphs representing
 #'         the data removed in the regression are also returned
 #'
-csd_ss_anom_at <- function(process_output,
+csd_ss_anom_la <- function(process_output,
                            concept_col,
-                           filtered_var='ibd',
-                           filter_concept=81893,
+                           filtered_var,
+                           filter_concept,
                            facet=NULL){
 
   time_inc <- process_output %>% filter(!is.na(time_increment)) %>% distinct(time_increment) %>% pull()
@@ -301,7 +296,7 @@ csd_ss_anom_at <- function(process_output,
 }
 
 
-#' *Single Site, Exploratory, Across Time*
+#' *Single Site, Exploratory, Longitudinal*
 #'
 #' @param process_output dataframe output by `csd_process`
 #' @param concept_col the name of the column from the concept_set used to identify concepts
@@ -318,10 +313,10 @@ csd_ss_anom_at <- function(process_output,
 #' @return a reference table with total counts of each code across the entire user selected
 #'         time period
 #'
-csd_ss_exp_at <- function(process_output,
+csd_ss_exp_la <- function(process_output,
                           concept_col,
                           facet=NULL,
-                          filtered_var = c('spondyloarthritis'),
+                          filtered_var,
                           num_mappings = 10,
                           output_value='prop_concept'){
 
@@ -393,7 +388,7 @@ csd_ss_exp_at <- function(process_output,
 
 }
 
-#' *Multi Site, Exploratory, Across Time*
+#' *Multi Site, Exploratory, Longitudinal*
 #'
 #' @param process_output dataframe output by `csd_process`
 #' @param concept_col the name of the column from the concept_set used to identify concepts
@@ -410,11 +405,11 @@ csd_ss_exp_at <- function(process_output,
 #' @return a reference table with total counts of each code across the entire user selected
 #'         time period
 #'
-csd_ms_exp_at <- function(process_output,
+csd_ms_exp_la <- function(process_output,
                           concept_col,
                           facet=NULL,
-                          filtered_var = c('ibd','spondyloarthritis'),
-                          filtered_concept = c(81893),
+                          filtered_var,
+                          filtered_concept,
                           output_value='prop_concept'){
 
   output_value <- output_value
@@ -472,7 +467,7 @@ csd_ms_exp_at <- function(process_output,
 }
 
 
-#' *Multi Site, Exploratory, No Time*
+#' *Multi Site, Exploratory, Cross-Sectional*
 #'
 #' @param process_output dataframe output by `csd_process`
 #' @param facet the variables by which you would like to facet the graph;
@@ -484,10 +479,10 @@ csd_ms_exp_at <- function(process_output,
 #'
 #' @return a searchable and filterable table with mappings, proportion of representation, and
 #'         denominator counts for the number of codes selected
-#'         in @num_codes
+#'         in `num_codes`
 #'
-csd_ms_exp_nt <- function(process_output,
-                          facet,
+csd_ms_exp_cs <- function(process_output,
+                          facet = NULL,
                           concept_col,
                           num_codes = 10){
 
@@ -540,7 +535,7 @@ csd_ms_exp_nt <- function(process_output,
 }
 
 
-#' *Multi-Site Anomaly No Time*
+#' *Multi-Site, Anomaly, Cross-Sectional*
 #'
 #' @param process_output output from `csd_process`
 #' @param concept_col the name of the column from the concept_set used to identify concepts
@@ -558,10 +553,10 @@ csd_ms_exp_nt <- function(process_output,
 #'         usage across all sites
 #'
 
-csd_ms_anom_nt<-function(process_output,
+csd_ms_anom_cs<-function(process_output,
                          concept_col,
                          text_wrapping_char=80,
-                         filtered_var='ibd',
+                         filtered_var,
                          comparison_col='prop_concept'){
 
   cname_samp <- process_output %>% head(1) %>% select(concept_name) %>% pull()
@@ -661,7 +656,7 @@ csd_ms_anom_nt<-function(process_output,
 
 }
 
-#' **Multi-Site Across Time Anomaly**
+#' **Multi-Site, Anomaly, Longitudinal**
 #'
 #' @param process_output output from `csd_process`
 #' @param filter_concept the concept_id that should be used for the output
@@ -677,7 +672,7 @@ csd_ms_anom_nt<-function(process_output,
 #' THIS GRAPH SHOWS ONLY ONE CONCEPT AT A TIME!
 #'
 
-csd_ms_anom_at <- function(process_output,
+csd_ms_anom_la <- function(process_output,
                            filter_concept,
                            concept_col){
 

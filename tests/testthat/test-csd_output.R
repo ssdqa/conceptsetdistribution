@@ -17,7 +17,7 @@ test_that('ss exp nt', {
                             prop_concept = c(0.5, 0.25, 0.25))
 
   expect_no_error(csd_output(process_output = tbl_test,
-                             output_function = 'csd_ss_exp_nt',
+                             output_function = 'csd_ss_exp_cs',
                              vocab_tbl = NULL,
                              concept_set = NULL))
 
@@ -33,7 +33,7 @@ test_that('ms exp nt', {
                             prop_concept = c(0.5, 0.25, 0.25))
 
   expect_no_error(csd_output(process_output = tbl_test,
-                             output_function = 'csd_ms_exp_nt',
+                             output_function = 'csd_ms_exp_cs',
                              vocab_tbl = NULL,
                              concept_set = NULL))
 
@@ -56,7 +56,8 @@ test_that('ss anom nt', {
                             'above_sd' = TRUE)
 
   expect_no_error(csd_output(process_output = tbl_test,
-                             output_function = 'csd_ss_anom_nt',
+                             output_function = 'csd_ss_anom_cs',
+                             filter_variable = 'test',
                              vocab_tbl = NULL,
                              concept_set = NULL))
 
@@ -85,7 +86,7 @@ test_that('ms exp nt', {
                             'anomaly_yn' = c('no outlier', 'outlier', 'outlier'))
 
   expect_no_error(csd_output(process_output = tbl_test,
-                             output_function = 'csd_ms_exp_nt',
+                             output_function = 'csd_ms_exp_cs',
                              vocab_tbl = NULL,
                              concept_set = NULL))
 
@@ -104,8 +105,8 @@ test_that('ss exp at', {
                             prop_concept = c(0.5, 0.25, 0.25))
 
   expect_no_error(csd_output(process_output = tbl_test,
-                             output_function = 'csd_ss_exp_at',
-                             filtered_var = 'test',
+                             output_function = 'csd_ss_exp_la',
+                             filter_variable = 'test',
                              vocab_tbl = NULL,
                              concept_set = NULL))
 
@@ -126,8 +127,8 @@ test_that('ms exp at', {
                             prop_concept = c(0.5, 0.25, 0.25,0.5,0.25,0.25))
 
   expect_no_error(csd_output(process_output = tbl_test,
-                             output_function = 'csd_ms_exp_at',
-                             filtered_var = 'test',
+                             output_function = 'csd_ms_exp_la',
+                             filter_variable = 'test',
                              filter_concept = 1,
                              vocab_tbl = NULL,
                              concept_set = NULL))
@@ -157,8 +158,8 @@ test_that('ss anom at', {
                             'observed_clean' = c(0.46, 0.57, 0.69))
 
   expect_no_error(csd_output(process_output = tbl_test,
-                             output_function = 'csd_ss_anom_at',
-                             filtered_var = 'test',
+                             output_function = 'csd_ss_anom_la',
+                             filter_variable = 'test',
                              filter_concept = 1,
                              vocab_tbl = NULL,
                              concept_set = NULL))
@@ -186,8 +187,8 @@ test_that('ms exp at', {
                             'dist_eucl_mean' = c(0.84,0.84,0.84,0.84,0.84,0.9))
 
   expect_no_error(csd_output(process_output = tbl_test,
-                             output_function = 'csd_ms_anom_at',
-                             filtered_var = 'test',
+                             output_function = 'csd_ms_anom_la',
+                             filter_variable = 'test',
                              filter_concept = 1,
                              vocab_tbl = NULL,
                              concept_set = NULL))

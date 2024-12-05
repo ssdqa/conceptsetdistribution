@@ -96,5 +96,11 @@ to \code{year}, but other time periods such as \code{month} or \code{week} are a
 a dataframe summarizing the distribution of code usage for each user defined variable
 }
 \description{
-Concept Set Distribution
+This is an information representation module that will compute the distribution of concept usage in a
+user-provided annotated concept set. The user will define the domains of interest (\code{domain_tbl}) and
+provide the concept set to be evaluated (\code{concept_set}). Sample versions of these inputs are
+included as data in the package and are accessible with \verb{conceptsetdistribution::}.
+Results can optionally be stratified by site, age group, and/or time.
+This function is compatible with both the OMOP and the PCORnet CDMs based on the
+user's selection.
 }

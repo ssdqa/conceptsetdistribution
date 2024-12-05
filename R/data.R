@@ -6,7 +6,7 @@
 #' this file and include their own domain definitions.
 #'
 #' @format ## `csd_domain_file`
-#' A data frame with 3 rows and 3 columns
+#' A data frame with 3 columns
 #' \describe{
 #'   \item{domain}{The name of the CDM table associated with the domain where the concept of interest can be found. Should match the domain listed in the concept_set file.}
 #'   \item{concept_field}{The name of the column in the domain table that contains the concepts of interest listed in the concept_set file.}
@@ -24,7 +24,7 @@
 #' file and include their own clinical concepts.
 #'
 #' @format ## `csd_concept_set`
-#' A data frame with 6 rows and 6 columns
+#' A data frame with 6 columns
 #' \describe{
 #'   \item{concept_id}{The OMOP concept_id; if the PCORnet CDM is being used, default this column to a random integer like the row number}
 #'   \item{concept_code}{The original code associated with the concept_id}

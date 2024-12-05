@@ -1,14 +1,25 @@
 Package: conceptsetdistribution
-Title: What the Package Does (One Line, Title Case)
+Title: Examine the Distribution of Concept Representation
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+    c(person("Hanieh", "Razzaghi", email = "razzaghih@chop.edu", role = c("aut"),
+             comment = c(ORCID = "0000-0001-5001-1590")),
+      person("Kaleigh", "Wieand", email = "wieandk@chop.edu", role = c("aut", "cre"),
+             comment = c(ORCID = "0009-0003-7477-2601")),
+      person("Kimberley", "Dickinson", email = "dickinsokl@chop.edu", role = c("aut"),
+             comment = c(ORCID = "0000-0001-9523-056X")),
+      person("Charles", "Bailey", email = "baileyc@chop.edu", role = c("aut"),
+             comment = c(ORCID = "0000-0002-8967-0662")))
+Description: The Concept Set Distribution module, part of the larger SSDQA ecosystem,
+    provides distributions of concepts that form or represent a particular variable in a 
+    dataset. This allows users to understand how each individual concept in a concept-set
+    impacts the representation of a variable within the data.
 License: MPL-2.0
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
+URL: https://github.com/ssdqa/conceptsetdistribution, https://pedsnetapps.chop.edu/metadata/collections/89107ca4-cfb8-405f-8239-bdcb958f65d5
+BugReports: https://github.com/ssdqa/conceptsetdistribution/issues
 Imports: 
     cli (>= 3.6.3),
     dplyr (>= 1.1.4),
