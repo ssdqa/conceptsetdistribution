@@ -76,7 +76,7 @@ csd_output <- function(process_output,
                                 num_mappings = num_mappings)
   }else if(output_function == 'csd_ss_anom_cs'){
     csd_output <- csd_ss_anom_cs(process_output,
-                                 concept_col = concept_col,
+                                 #concept_col = concept_col,
                                  vocab_tbl = vocab_tbl,
                                  filtered_var = filter_variable)
   }else if(output_function == 'csd_ss_exp_la'){

@@ -116,8 +116,6 @@ csd_ss_exp_cs <- function(process_output,
 #'
 #'
 #' @param process_output the output from `csd_process`
-#' @param concept_col the name of the column from the concept_set used to identify concepts
-#'                    should be either `concept_id` or `concept_code`
 #' @param vocab_tbl OPTIONAL: the location of an external vocabulary table containing concept names for
 #'                  the provided codes. if not NULL, concept names will be available in either a reference
 #'                  table or in a hover tooltip
@@ -126,7 +124,7 @@ csd_ss_exp_cs <- function(process_output,
 #' @return for a given variable, a heatmap of the jaccard index for each concept pair
 #'
 csd_ss_anom_cs <- function(process_output,
-                           concept_col,
+                           #concept_col,
                            vocab_tbl = NULL,
                            filtered_var){
 
@@ -138,6 +136,7 @@ csd_ss_anom_cs <- function(process_output,
     distinct(value) %>% summarise(n()) %>% pull()
 
   if(var_ct > 20){cli::cli_alert_warning('Output has been limited to top 20 concepts to improve visibility on axes.')}
+  if(var_ct == 0){cli::cli_abort(paste0('No concept pairs were returned for the variable ', filtered_var, '. Please choose another.'))}
 
   vars <- process_output %>%
     filter(variable == filtered_var, above_sd == TRUE) %>%
@@ -151,6 +150,9 @@ csd_ss_anom_cs <- function(process_output,
     arrange(desc(value2)) %>% slice(1:20) %>% pull(value)
 
   ## Join to vocab
+  concept_col <- ifelse(class(process_output$concept1) %in% 'character',
+                        'concept_code', 'concept_id')
+
   firstcolnames <- join_to_vocabulary(tbl = process_output,
                                       vocab_tbl = vocab_tbl,
                                       col = 'concept1',
