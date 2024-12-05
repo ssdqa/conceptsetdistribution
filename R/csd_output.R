@@ -54,7 +54,7 @@ csd_output <- function(process_output,
   }else{process_output <- process_output}
 
   ## Get concept names from vocabulary table
-  if(output_function != 'csd_ss_anom_nt'){
+  if(output_function != 'csd_ss_anom_cs'){
 
     if(is.null(concept_set)){
       process_output <- process_output
