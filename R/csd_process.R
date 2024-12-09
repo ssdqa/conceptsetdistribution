@@ -62,6 +62,8 @@
 #' @import ssdqa.gen
 #' @importFrom stringr str_wrap
 #'
+#' @example inst/example-csd_process_output.R
+#'
 #' @export
 #'
 csd_process <- function(cohort,

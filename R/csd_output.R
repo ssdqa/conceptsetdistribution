@@ -30,6 +30,8 @@
 #' @return a graph to visualize the results from `csd_process` based on the parameters provided; see documentation
 #'         for individual subfunctions for details on specific output
 #'
+#' @example inst/example-csd_process_output.R
+#'
 #' @export
 #'
 csd_output <- function(process_output,
