@@ -216,7 +216,8 @@ check_code_dist_ssanom_omop <- function(cohort_codedist,
         ungroup %>% select(concept_id,variable) %>% distinct() %>%  collect()
 
      jaccards <- compute_jaccard(variable_flattened,
-                                 var_col = 'concept_id') %>%
+                                 var_col = 'concept_id',
+                                 omop_or_pcornet = 'omop') %>%
        mutate(variable = i)
 
      variable_summary[[i]] <- jaccards
