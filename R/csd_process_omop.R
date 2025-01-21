@@ -172,7 +172,7 @@ csd_process_omop <- function(cohort,
 
     }else if(multi_or_single_site == 'single' & anomaly_or_exploratory=='anomaly'){
 
-      csd_tbl_ss <- anomalize_ss_anom_at(fot_input_tbl = csd_tbl,
+      csd_tbl_ss <- anomalize_ss_anom_la(fot_input_tbl = csd_tbl,
                                          grp_vars = 'concept_id',
                                          time_var = 'time_start',
                                          var_col = 'prop_concept')
