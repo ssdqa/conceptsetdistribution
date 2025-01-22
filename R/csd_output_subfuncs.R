@@ -423,7 +423,7 @@ csd_ms_exp_la <- function(process_output,
   if(length(site_num)>1){
     facet <- facet %>% append('concept_id_label')
   } else {
-    facet <- facet %>% append('variable')
+    facet <- facet %>% append('concept_id_label')
   }
 
 
