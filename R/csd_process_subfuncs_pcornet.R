@@ -238,7 +238,7 @@ check_code_dist_ssanom_pcnt <- function(cohort_codedist,
 
         variable_summary[[i]] <- jaccards
       }else{
-        cli::cli_inform('No variable matches -- skipping to next')
+        cli::cli_inform(paste0('No variable matches for ', i,' -- skipping to next'))
         next
       }
 
