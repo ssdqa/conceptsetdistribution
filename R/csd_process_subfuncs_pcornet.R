@@ -224,16 +224,23 @@ check_code_dist_ssanom_pcnt <- function(cohort_codedist,
       variable_flattened <- reduce(.x=variable_combined,
                                    .f=dplyr::union)
 
-      var_domain_lookup <-
-        variable_flattened %>%
-        ungroup %>% select(concept_code,variable) %>% distinct() %>%  collect()
+      row_check <- tally(ungroup(variable_flattened)) %>% pull()
 
-     jaccards <- compute_jaccard(variable_flattened,
-                                 var_col = 'concept_code',
-                                 omop_or_pcornet = 'pcornet') %>%
-       mutate(variable = i)
+      if(row_check != 0){
+        var_domain_lookup <-
+          variable_flattened %>%
+          ungroup %>% select(concept_code,variable) %>% distinct() %>%  collect()
 
-     variable_summary[[i]] <- jaccards
+        jaccards <- compute_jaccard(variable_flattened,
+                                    var_col = 'concept_code',
+                                    omop_or_pcornet = 'pcornet') %>%
+          mutate(variable = i)
+
+        variable_summary[[i]] <- jaccards
+      }else{
+        cli::cli_inform('No variable matches -- skipping to next')
+        next
+      }
 
     }
 

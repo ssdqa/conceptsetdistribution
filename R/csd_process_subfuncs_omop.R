@@ -211,6 +211,9 @@ check_code_dist_ssanom_omop <- function(cohort_codedist,
       variable_flattened <- reduce(.x=variable_combined,
                                    .f=dplyr::union)
 
+      row_check <- tally(ungroup(variable_flattened)) %>% pull()
+
+    if(row_check != 0){
       var_domain_lookup <-
         variable_flattened %>%
         ungroup %>% select(concept_id,variable) %>% distinct() %>%  collect()
@@ -221,6 +224,10 @@ check_code_dist_ssanom_omop <- function(cohort_codedist,
        mutate(variable = i)
 
      variable_summary[[i]] <- jaccards
+    }else{
+       cli::cli_inform('No variable matches -- skipping to next')
+       next
+     }
 
     }
 
