@@ -2,7 +2,7 @@
 
 #' Concept Set Distribution - PCORnet Version
 #'
-#' @param cohort cohort for SSDQA testing; required fields:
+#' @param cohort cohort for SQUBA testing; required fields:
 #' - `site`
 #' - `patid`
 #' - `start_date`

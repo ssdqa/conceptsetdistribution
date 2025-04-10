@@ -88,7 +88,7 @@ csd_ss_exp_cs <- function(process_output,
                                  fill = !!sym(prop))) +
       geom_tile_interactive(aes(tooltip = concept_name)) +
       geom_text(aes(label = !!sym(prop)), size = 3, color = 'black') +
-      scale_fill_ssdqa(palette = 'diverging', discrete = FALSE) +
+      scale_fill_squba(palette = 'diverging', discrete = FALSE) +
       facet_wrap((facet), scales = 'free') +
       theme_minimal() +
       #theme(axis.text.x = element_blank()) +
@@ -179,7 +179,7 @@ csd_ss_anom_cs <- function(process_output,
                                                  '\n', 'co-occurrence = ', cocount,
                                                  '\n','jaccard sim = ',jaccard_index,
                                                  '\n', 'mean = ',var_jaccard_mean,'\n','sd = ', var_jaccard_sd))) +
-      scale_fill_ssdqa(palette = 'diverging', discrete = FALSE) +
+      scale_fill_squba(palette = 'diverging', discrete = FALSE) +
        labs(title = paste0('Jaccard Similarity Index for ', filtered_var, ' Concepts'),
             x = 'concept1',
             y = 'concept2',
@@ -239,11 +239,11 @@ csd_ss_anom_la <- function(process_output,
 
   new_pp <- ggplot(op_dat,aes(x,y)) +
     geom_ribbon(aes(ymin = lcl,ymax = ucl), fill = "lightgray",alpha = 0.4) +
-    geom_line(colour = ssdqa_colors_standard[[12]], size = .5) +
+    geom_line(colour = squba_colors_standard[[12]], size = .5) +
     geom_line(aes(x,cl)) +
-    geom_point(colour = ssdqa_colors_standard[[6]] , fill = ssdqa_colors_standard[[6]], size = 1) +
-    geom_point(data = subset(op_dat, y >= ucl), color = ssdqa_colors_standard[[3]], size = 2) +
-    geom_point(data = subset(op_dat, y <= lcl), color = ssdqa_colors_standard[[3]], size = 2) +
+    geom_point(colour = squba_colors_standard[[6]] , fill = squba_colors_standard[[6]], size = 1) +
+    geom_point(data = subset(op_dat, y >= ucl), color = squba_colors_standard[[3]], size = 2) +
+    geom_point(data = subset(op_dat, y <= lcl), color = squba_colors_standard[[3]], size = 2) +
     facet_wrap(~facet1) +
     ggtitle(label = 'Control Chart: Code Usage Over Time') +
     labs(x = 'Time',
@@ -378,7 +378,7 @@ csd_ss_exp_la <- function(process_output,
          y = 'Proportion',
          x = 'Time') +
     theme_minimal() +
-    scale_color_ssdqa()
+    scale_color_squba()
 
   p[["metadata"]] <- tibble('pkg_backend' = 'plotly',
                             'tooltip' = TRUE)
@@ -456,7 +456,7 @@ csd_ms_exp_la <- function(process_output,
          y = 'Proportion',
          x = 'Time') +
     theme_minimal() +
-    scale_color_ssdqa()
+    scale_color_squba()
 
   p[["metadata"]] <- tibble('pkg_backend' = 'plotly',
                             'tooltip' = TRUE)
@@ -526,7 +526,7 @@ csd_ms_exp_cs <- function(process_output,
     #gtExtras::gt_plt_bar_pct(column = pct) %>%
     fmt_number(columns = ct, decimals = 0) %>%
     fmt_percent(columns = prop, decimals = 0) %>%
-    data_color(palette = ssdqa_colors_standard, columns = c(all_of(facet))) %>%
+    data_color(palette = squba_colors_standard, columns = c(all_of(facet))) %>%
     tab_header(title = paste0('All Available Mappings for Top ', num_codes, ' Variables')) %>%
     opt_interactive(use_search = TRUE,
                     use_filters = TRUE)
@@ -592,7 +592,7 @@ csd_ms_anom_cs<-function(process_output,
       geom_point_interactive(aes(size=mean_val,shape=anomaly_yn, tooltip = text))+
       geom_point_interactive(data = dat_to_plot %>% filter(anomaly_yn == 'not outlier'),
                              aes(size=mean_val,shape=anomaly_yn, tooltip = text), shape = 1, color = 'black')+
-      scale_color_ssdqa(palette = 'diverging', discrete = FALSE) +
+      scale_color_squba(palette = 'diverging', discrete = FALSE) +
       scale_shape_manual(values=c(19,8))+
       scale_y_discrete(labels = function(x) str_wrap(x, width = text_wrapping_char)) +
       theme_minimal() +
@@ -617,7 +617,7 @@ csd_ms_anom_cs<-function(process_output,
                                    tooltip = text)) +
       geom_tile_interactive() +
       theme_minimal() +
-      scale_fill_ssdqa(discrete = FALSE, palette = 'diverging') +
+      scale_fill_squba(discrete = FALSE, palette = 'diverging') +
       labs(y = 'Concept',
            x = 'Site',
            fill = 'Proportion')
@@ -639,7 +639,7 @@ csd_ms_anom_cs<-function(process_output,
                                       tooltip = tooltip)) +
       geom_point_interactive(show.legend = FALSE) +
       theme_minimal() +
-      scale_color_ssdqa() +
+      scale_color_squba() +
       geom_hline(yintercept = 0, linetype = 'solid') +
       labs(title = 'Average Standard Deviation per Site',
            y = 'Average Standard Deviation',
@@ -704,7 +704,7 @@ csd_ms_anom_la <- function(process_output,
     ggplot(aes(y = prop_concept, x = time_start, color = site, group = site, text = text_smooth)) +
     geom_line(data=allsites, linewidth=1.1) +
     geom_smooth(se=TRUE,alpha=0.1,linewidth=0.5, formula = y ~ x) +
-    scale_color_ssdqa() +
+    scale_color_squba() +
     theme_minimal() +
     #theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust=1)) +
     labs(y = 'Proportion (Loess)',
@@ -714,7 +714,7 @@ csd_ms_anom_la <- function(process_output,
   q <- dat_to_plot %>%
     ggplot(aes(y = prop_concept, x = time_start, color = site,
                group=site, text=text_raw)) +
-    scale_color_ssdqa() +
+    scale_color_squba() +
     geom_line(data=allsites,linewidth=1.1) +
     geom_line(linewidth=0.2) +
     theme_minimal() +
@@ -737,7 +737,7 @@ csd_ms_anom_la <- function(process_output,
     coord_radial(r.axis.inside = FALSE, rotate.angle = TRUE) +
     guides(theta = guide_axis_theta(angle = 0)) +
     theme_minimal() +
-    scale_fill_ssdqa(palette = 'diverging', discrete = FALSE) +
+    scale_fill_squba(palette = 'diverging', discrete = FALSE) +
     # theme(legend.position = 'bottom',
     #       legend.text = element_text(angle = 45, vjust = 0.9, hjust = 1),
     #       axis.text.x = element_text(face = 'bold'))

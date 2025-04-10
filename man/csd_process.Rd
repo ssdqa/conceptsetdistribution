@@ -22,7 +22,7 @@ csd_process(
 )
 }
 \arguments{
-\item{cohort}{cohort for SSDQA testing; required fields:
+\item{cohort}{cohort for SQUBA testing; required fields:
 \itemize{
 \item \code{site}
 \item \code{person_id}
@@ -161,7 +161,7 @@ csd_output_example <- csd_output(process_output = csd_process_example,
 csd_output_example
 
 #' Easily convert the graph into an interactive ggiraph or plotly object with
-#' `make_interactive_ssdqa()`
+#' `make_interactive_squba()`
 
-make_interactive_ssdqa(csd_output_example)
+make_interactive_squba(csd_output_example)
 }

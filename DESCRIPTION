@@ -10,7 +10,7 @@ Authors@R:
              comment = c(ORCID = "0000-0001-9523-056X")),
       person("Charles", "Bailey", email = "baileyc@chop.edu", role = c("aut"),
              comment = c(ORCID = "0000-0002-8967-0662")))
-Description: The Concept Set Distribution module, part of the larger SSDQA ecosystem,
+Description: The Concept Set Distribution module, part of the larger SQUBA ecosystem,
     provides distributions of concepts that form or represent a particular variable in a 
     dataset. This allows users to understand how each individual concept in a concept-set
     impacts the representation of a variable within the data.
@@ -36,8 +36,8 @@ Imports:
 Depends: 
     argos,
     R (>= 2.10),
-    ssdqa.gen
-Remotes: PEDSnet/argos, ssdqa/ssdqa.gen
+    squba.gen
+Remotes: PEDSnet/argos, ssdqa/squba.gen
 LazyData: true
 Suggests: 
     DBI,

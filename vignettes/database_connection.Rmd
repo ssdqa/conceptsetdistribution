@@ -14,11 +14,11 @@ knitr::opts_chunk$set(
 )
 ```
 
-In order to use each of the packages in the SSDQA ecosystem, you must first be able to connect to your CDM formatted data in the database where it is stored. We have included a helper function that will allow you to more easily set up this connection and provide the package with the information it needs to execute the analyses.
+In order to use each of the packages in the SQUBA ecosystem, you must first be able to connect to your CDM formatted data in the database where it is stored. We have included a helper function that will allow you to more easily set up this connection and provide the package with the information it needs to execute the analyses.
 
 ## initialize_dq_session
 
-`initialize_dq_session` is the helper function included in the `ssdqa.gen` package and accessible through all other SSDQA ecosystem packages. This function will intake user-specific database connection information and use these to set up internal configurations that will allow the data quality analyses to run.
+`initialize_dq_session` is the helper function included in the `squba.gen` package and accessible through all other SQUBA ecosystem packages. This function will intake user-specific database connection information and use these to set up internal configurations that will allow the data quality analyses to run.
 
 We use a framework called `argos` to facilitate accessing the data, so it is **required** to establish a connection via this function. This ensures that all internal functions and configurations are appropriately established without a need from the user to directly interact with this framework. More information on `argos` can be found [here](https://github.com/PEDSnet/argos).
 

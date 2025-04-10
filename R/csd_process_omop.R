@@ -2,7 +2,7 @@
 
 #' Concept Set Distribution - OMOP Version
 #'
-#' @param cohort cohort for SSDQA testing; required fields:
+#' @param cohort cohort for SQUBA testing; required fields:
 #' - `site`
 #' - `person_id`
 #' - `start_date`
@@ -50,7 +50,7 @@
 #' @return a dataframe summarizing the distribution of code usage for each user defined variable
 #'
 #' @import argos
-#' @import ssdqa.gen
+#' @import squba.gen
 #' @importFrom stringr str_wrap
 #'
 #'
