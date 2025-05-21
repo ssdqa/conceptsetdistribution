@@ -14,10 +14,11 @@ test_that('ss exp nt', {
                             concept_id = c(1,2,3),
                             ct_denom = c(100,100,100),
                             ct_concept = c(50,25,25),
-                            prop_concept = c(0.5, 0.25, 0.25))
+                            prop_concept = c(0.5, 0.25, 0.25),
+                            output_function = c('csd_ss_exp_cs','csd_ss_exp_cs','csd_ss_exp_cs'))
 
   expect_no_error(csd_output(process_output = tbl_test,
-                             output_function = 'csd_ss_exp_cs',
+                             # output_function = 'csd_ss_exp_cs',
                              vocab_tbl = NULL,
                              concept_set = NULL))
 
@@ -30,10 +31,11 @@ test_that('ms exp nt', {
                             concept_id = c(1,2,3),
                             ct_denom = c(100,100,100),
                             ct_concept = c(50,25,25),
-                            prop_concept = c(0.5, 0.25, 0.25))
+                            prop_concept = c(0.5, 0.25, 0.25),
+                            output_function = c('csd_ms_exp_cs','csd_ms_exp_cs','csd_ms_exp_cs'))
 
   expect_no_error(csd_output(process_output = tbl_test,
-                             output_function = 'csd_ms_exp_cs',
+                             # output_function = 'csd_ms_exp_cs',
                              vocab_tbl = NULL,
                              concept_set = NULL))
 
@@ -53,17 +55,18 @@ test_that('ss anom nt', {
                             'variable' = 'test',
                             'var_jaccard_mean' = 0.8,
                             'var_jaccard_sd' = 0.1,
-                            'above_sd' = TRUE)
+                            'above_sd' = TRUE,
+                            'output_function' = c('csd_ss_anom_cs'))
 
   expect_no_error(csd_output(process_output = tbl_test,
-                             output_function = 'csd_ss_anom_cs',
+                             # output_function = 'csd_ss_anom_cs',
                              filter_variable = 'test',
                              vocab_tbl = NULL,
                              concept_set = NULL))
 
 })
 
-test_that('ms exp nt', {
+test_that('ms anom nt', {
 
   tbl_test <- tidyr::tibble('site' = c('a', 'b', 'c'),
                             'variable' = c('test', 'test', 'test'),
@@ -83,10 +86,12 @@ test_that('ms exp nt', {
                             'analysis_eligible' = c('yes','yes','yes'),
                             'lower_tail' = c(0.8134, 0.8134, 0.8134),
                             'upper_tail' = c(0.932, 0.932, 0.932),
-                            'anomaly_yn' = c('no outlier', 'outlier', 'outlier'))
+                            'anomaly_yn' = c('no outlier', 'outlier', 'outlier'),
+                            output_function = c('csd_ms_anom_cs','csd_ms_anom_cs','csd_ms_anom_cs'))
 
   expect_no_error(csd_output(process_output = tbl_test,
-                             output_function = 'csd_ms_exp_cs',
+                             # output_function = 'csd_ms_exp_cs',
+                             filter_variable = 'test',
                              vocab_tbl = NULL,
                              concept_set = NULL))
 
@@ -102,10 +107,11 @@ test_that('ss exp at', {
                             concept_id = c(1,1,1),
                             ct_denom = c(100,100,100),
                             ct_concept = c(50,25,25),
-                            prop_concept = c(0.5, 0.25, 0.25))
+                            prop_concept = c(0.5, 0.25, 0.25),
+                            output_function = c('csd_ss_exp_la','csd_ss_exp_la','csd_ss_exp_la'))
 
   expect_no_error(csd_output(process_output = tbl_test,
-                             output_function = 'csd_ss_exp_la',
+                             # output_function = 'csd_ss_exp_la',
                              filter_variable = 'test',
                              vocab_tbl = NULL,
                              concept_set = NULL))
@@ -124,10 +130,12 @@ test_that('ms exp at', {
                             concept_id = c(1,1,1,1,1,1),
                             ct_denom = c(100,100,100,100,100,100),
                             ct_concept = c(50,25,25,50,25,25),
-                            prop_concept = c(0.5, 0.25, 0.25,0.5,0.25,0.25))
+                            prop_concept = c(0.5, 0.25, 0.25,0.5,0.25,0.25),
+                            output_function = c('csd_ms_exp_la','csd_ms_exp_la','csd_ms_exp_la',
+                                                'csd_ms_exp_la', 'csd_ms_exp_la', 'csd_ms_exp_la'))
 
   expect_no_error(csd_output(process_output = tbl_test,
-                             output_function = 'csd_ms_exp_la',
+                             # output_function = 'csd_ms_exp_la',
                              filter_variable = 'test',
                              filter_concept = 1,
                              vocab_tbl = NULL,
@@ -155,10 +163,11 @@ test_that('ss anom at', {
                             'anomaly_score' = c(1,2,3),
                             'recomposed_l1' = c(0.44, 0.6, 0.5),
                             'recomposed_l2' = c(0.84, 0.8, 0.8),
-                            'observed_clean' = c(0.46, 0.57, 0.69))
+                            'observed_clean' = c(0.46, 0.57, 0.69),
+                            'output_function' = c('csd_ss_anom_la','csd_ss_anom_la','csd_ss_anom_la'))
 
   expect_no_error(csd_output(process_output = tbl_test,
-                             output_function = 'csd_ss_anom_la',
+                             # output_function = 'csd_ss_anom_la',
                              filter_variable = 'test',
                              filter_concept = 1,
                              vocab_tbl = NULL,
@@ -184,10 +193,12 @@ test_that('ms exp at', {
                             'median' = c(0.87, 0.87, 0.87, 0.87, 0.87, 0.87),
                             'date_numeric' = c(17000, 17000, 17000, 17000, 17000, 17000),
                             'site_loess' = c(0.84, 0.87, 0.89, 0.91, 0.89, 0.73),
-                            'dist_eucl_mean' = c(0.84,0.84,0.84,0.84,0.84,0.9))
+                            'dist_eucl_mean' = c(0.84,0.84,0.84,0.84,0.84,0.9),
+                            'output_function' = c('csd_ms_anom_la','csd_ms_anom_la','csd_ms_anom_la',
+                                                  'csd_ms_anom_la', 'csd_ms_anom_la', 'csd_ms_anom_la'))
 
   expect_no_error(csd_output(process_output = tbl_test,
-                             output_function = 'csd_ms_anom_la',
+                             # output_function = 'csd_ms_anom_la',
                              filter_variable = 'test',
                              filter_concept = 1,
                              vocab_tbl = NULL,

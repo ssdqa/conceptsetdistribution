@@ -47,7 +47,6 @@ csd_process_example
 
 #' Execute `csd_output` function
 csd_output_example <- csd_output(process_output = csd_process_example,
-                                 output_function = 'csd_ss_exp_cs',
                                  concept_set = csd_concept_tbl,
                                  vocab_tbl = NULL)
 

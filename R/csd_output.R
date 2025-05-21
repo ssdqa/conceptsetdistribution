@@ -6,26 +6,23 @@
 #' be adjusted by the user after the graph has been output using `+ theme()`. Most graphs can
 #' also be made interactive using `make_interactive_squba()`
 #'
-#' @param process_output the output from `csd_process`
-#' @param output_function the name of the output function that should be executed, provided in the message output
-#'                        to the console after `csd_process` has been executed
-#' @param concept_set the same concept set used in the `csd_process` function; only required if `vocab_tbl` is not NULL
-#' @param vocab_tbl OPTIONAL: the location of an external vocabulary table containing concept names for
+#' @param process_output *tabular input* | the output from `csd_process`
+#' @param concept_set *tabular input* | the same concept set used in the `csd_process` function; only required if `vocab_tbl` is not NULL
+#' @param vocab_tbl *tabular input* | OPTIONAL: the location of an external vocabulary table containing concept names for
 #'                  the provided codes. if not NULL, concept names will be available in either a reference
 #'                  table or in a hover tooltip
-#' @param num_variables an integer to represent the top number of variables to include for the exploratory analyses;
+#' @param num_variables *integer* | an integer to represent the top number of variables to include for the exploratory analyses;
 #'                      will pick based on the most commonly appearing variables;
-#' @param num_mappings an integer to represent the top number of mappings for a given variable in the exploratory analyses;
+#' @param num_mappings *integer* | an integer to represent the top number of mappings for a given variable in the exploratory analyses;
 #'                     will pick based on the highest count of the most commonly appearing variables;
-#' @param filter_variable for both `single- and multi- site anomaly tests without time measurements` and
-#'                        `single- and multi- site exploratory tests with time measurements`, the variables
-#'                        to focus on
-#' @param filter_concept for `ss_anom_la`, `ms_exp_la`, and `ms_anom_la`, the specific code that should
-#'                       be the focus of the analysis
-#' @param text_wrapping_char an integer to limit the length of text on an axis before wrapping is enforced;
-#'                           used in `ms_anom_cs`
-#' @param output_value the numerical column in `process_output` that should be used in the visualization
-#'                     relevant for `ss_exp_la`, `ms_anom_cs`, and `ms_exp_la`
+#' @param filter_variable *string or vector* | the variable(s) to limit to for the analysis; used for all output types EXCEPT
+#'                        `ss_exp_cs`, `ms_exp_cs`, and `ms_anom_la`
+#' @param filter_concept *numeric/string or vector* | the specific code(s) that should be the focus of the analysis; used for
+#'                       `ss_anom_la`, `ms_exp_la`, and `ms_anom_la`
+#' @param text_wrapping_char *integer* | an integer to limit the length of text on an axis before wrapping is enforced;
+#'                           used for `ms_anom_cs`
+#' @param output_value *string* | the name of the numerical column in `process_output` that should be used in the visualization
+#'                     used for `ss_exp_la`, `ms_anom_cs`, and `ms_exp_la`
 #'
 #' @return a graph to visualize the results from `csd_process` based on the parameters provided; see documentation
 #'         for individual subfunctions for details on specific output
@@ -35,7 +32,7 @@
 #' @export
 #'
 csd_output <- function(process_output,
-                       output_function,
+                       # output_function,
                        concept_set = NULL,
                        vocab_tbl = NULL,
                        num_variables = 10,
@@ -45,6 +42,9 @@ csd_output <- function(process_output,
                        #facet=NULL,
                        text_wrapping_char = 80,
                        output_value = 'prop_concept'){
+
+  ## extract output function
+  output_function <- process_output %>% collect() %>% distinct(output_function) %>% pull()
 
   ## check concept col
   concept_col <- ifelse('concept_id' %in% colnames(process_output), 'concept_id', 'concept_code')

@@ -22,74 +22,74 @@ csd_process(
 )
 }
 \arguments{
-\item{cohort}{cohort for SQUBA testing; required fields:
+\item{cohort}{\emph{tabular input} | cohort for SQUBA testing; required fields:
 \itemize{
-\item \code{site}
-\item \code{person_id}
-\item \code{start_date}
-\item \code{end_date}
+\item \code{site} | \emph{character}
+\item \code{person_id} | \code{patid} | \emph{integer} / \emph{character}
+\item \code{start_date} | \emph{date}
+\item \code{end_date} | \emph{date}
 }}
 
-\item{domain_tbl}{input table defining the domains listed in the annotated concept set
+\item{domain_tbl}{\emph{tabular input} | input table defining the domains listed in the annotated concept set
 four columns:
 - \code{domain} the name of the CDM table associated with the concept; should match what is listed in the annotated concept set
 - \code{concept_field} the name of the field in the domain table where the concepts are located
 - \code{date_field} the name of the field in the domain table with the date that should be used for time-based filtering
 - \code{vocabulary_field} PCORnet only; set to NA}
 
-\item{concept_set}{an annotated concept set CSV file with the following columns:
+\item{concept_set}{\emph{tabular input} | an annotated concept set CSV file with the following columns:
 \itemize{
-\item \code{concept_id} required for OMOP; the concept_id of interest
-\item \code{concept_code} required for PCORnet; the code of interest
-\item \code{concept_name} optional; the descriptive name of the concept
-\item \code{vocabulary_id} required for PCORnet; the vocabulary of the code - should match what is listed in the domain table's vocabulary_field
-\item \code{variable} required; a string label grouping one concept code into a larger variable definition
-\item \code{domain} required; the name of the CDM table where the concept is stored - multiple domains can be included in the file, but only one domain should be listed per row
+\item \code{concept_id} | \emph{integer} |  required for OMOP; the concept_id of interest
+\item \code{concept_code} | \emph{character} | required for PCORnet; the code of interest
+\item \code{concept_name} | \emph{character} | optional; the descriptive name of the concept
+\item \code{vocabulary_id} | \emph{character} | required for PCORnet; the vocabulary of the code - should match what is listed in the domain table's vocabulary_field
+\item \code{variable} | \emph{character} | required; a string label grouping one concept code into a larger variable definition
+\item \code{domain} | \emph{character} | required; the name of the CDM table where the concept is stored - multiple domains can be included in the file, but only one domain should be listed per row
 }}
 
-\item{omop_or_pcornet}{Option to run the function using the OMOP or PCORnet CDM as the default CDM
+\item{omop_or_pcornet}{\emph{string} | Option to run the function using the OMOP or PCORnet CDM as the default CDM
 \itemize{
 \item \code{omop}: run the \code{\link[=csd_process_omop]{csd_process_omop()}} function against an OMOP CDM instance
 \item \code{pcornet}: run the \code{\link[=csd_process_pcornet]{csd_process_pcornet()}} function against a PCORnet CDM instance
 }}
 
-\item{multi_or_single_site}{Option to run the function on a single vs multiple sites
+\item{multi_or_single_site}{\emph{string} | Option to run the function on a single vs multiple sites
 \itemize{
 \item \code{single}: run the function for a single site
 \item \code{multi}: run the function for multiple sites
 }}
 
-\item{anomaly_or_exploratory}{Option to conduct an exploratory or anomaly detection analysis. Exploratory analyses give a high
+\item{anomaly_or_exploratory}{\emph{string} | Option to conduct an exploratory or anomaly detection analysis. Exploratory analyses give a high
 level summary of the data to examine the fact representation within the cohort. Anomaly detection
 analyses are specialized to identify outliers within the cohort.}
 
-\item{num_concept_combined}{when \code{multi_or_single_site} = \code{single} and \code{anomaly_or_exploratory} = \code{anomaly},
+\item{num_concept_combined}{\emph{boolean} | when \code{multi_or_single_site} = \code{single} and \code{anomaly_or_exploratory} = \code{anomaly},
 this argument is a boolean that will ensure that \code{concept1} and \code{concept2} meet some minimal threshold for including in the jaccard index
 if \code{TRUE}, then \emph{both} conditions for \code{num_concept_1} and \code{num_concept_2} should be met; if \code{FALSE} then just one condition needs to be met.}
 
-\item{num_concept_1}{when \code{multi_or_single_site} = \code{single} and \code{anomaly_or_exploratory} = \code{anomaly},
+\item{num_concept_1}{\emph{integer} | when \code{multi_or_single_site} = \code{single} and \code{anomaly_or_exploratory} = \code{anomaly},
 this argument is an integer and requires a minimum number of times that the \emph{first} concept appears in the dataset}
 
-\item{num_concept_2}{when \code{multi_or_single_site} = \code{single} and \code{anomaly_or_exploratory} = \code{anomaly},
+\item{num_concept_2}{\emph{integer} | when \code{multi_or_single_site} = \code{single} and \code{anomaly_or_exploratory} = \code{anomaly},
 this argument is an integer and requires a minimum number of times that the \emph{second} concept appears in the dataset}
 
-\item{p_value}{the p value to be used as a threshold in the multi-site anomaly detection analysis}
+\item{p_value}{\emph{numeric} | the p value to be used as a threshold in the multi-site anomaly detection analysis}
 
-\item{age_groups}{If you would like to stratify the results by age group,  create a table or CSV file with the following
+\item{age_groups}{\emph{tabular input} | If you would like to stratify the results by age group,  create a table or CSV file with the following
 columns and include it as the \code{age_groups} function parameter:
 \itemize{
-\item \code{min_age}: the minimum age for the group (i.e. 10)
-\item \code{max_age}: the maximum age for the group (i.e. 20)
-\item \code{group}: a string label for the group (i.e. 10-20, Young Adult, etc.)
+\item \code{min_age} | \emph{integer} | the minimum age for the group (i.e. 10)
+\item \code{max_age} | \emph{integer} | the maximum age for the group (i.e. 20)
+\item \code{group} | \emph{character} | a string label for the group (i.e. 10-20, Young Adult, etc.)
 }
 
 If you would \emph{not} like to stratify by age group, leave the argument as NULL}
 
-\item{time}{logical to determine whether to output the check across time}
+\item{time}{\emph{boolean} | logical to determine whether to output the check across time}
 
-\item{time_span}{when time = TRUE, a vector of two dates for the observation period of the study}
+\item{time_span}{\emph{vector - length 2} | when time = TRUE, a vector of two dates for the observation period of the study}
 
-\item{time_period}{when time = TRUE, this argument defines the distance between dates within the specified time period. defaults
+\item{time_period}{\emph{string} | when time = TRUE, this argument defines the distance between dates within the specified time period. defaults
 to \code{year}, but other time periods such as \code{month} or \code{week} are also acceptable}
 }
 \value{
@@ -154,7 +154,6 @@ csd_process_example
 
 #' Execute `csd_output` function
 csd_output_example <- csd_output(process_output = csd_process_example,
-                                 output_function = 'csd_ss_exp_cs',
                                  concept_set = csd_concept_tbl,
                                  vocab_tbl = NULL)
 

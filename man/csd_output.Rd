@@ -6,7 +6,6 @@
 \usage{
 csd_output(
   process_output,
-  output_function,
   concept_set = NULL,
   vocab_tbl = NULL,
   num_variables = 10,
@@ -18,35 +17,31 @@ csd_output(
 )
 }
 \arguments{
-\item{process_output}{the output from \code{csd_process}}
+\item{process_output}{\emph{tabular input} | the output from \code{csd_process}}
 
-\item{output_function}{the name of the output function that should be executed, provided in the message output
-to the console after \code{csd_process} has been executed}
+\item{concept_set}{\emph{tabular input} | the same concept set used in the \code{csd_process} function; only required if \code{vocab_tbl} is not NULL}
 
-\item{concept_set}{the same concept set used in the \code{csd_process} function; only required if \code{vocab_tbl} is not NULL}
-
-\item{vocab_tbl}{OPTIONAL: the location of an external vocabulary table containing concept names for
+\item{vocab_tbl}{\emph{tabular input} | OPTIONAL: the location of an external vocabulary table containing concept names for
 the provided codes. if not NULL, concept names will be available in either a reference
 table or in a hover tooltip}
 
-\item{num_variables}{an integer to represent the top number of variables to include for the exploratory analyses;
+\item{num_variables}{\emph{integer} | an integer to represent the top number of variables to include for the exploratory analyses;
 will pick based on the most commonly appearing variables;}
 
-\item{num_mappings}{an integer to represent the top number of mappings for a given variable in the exploratory analyses;
+\item{num_mappings}{\emph{integer} | an integer to represent the top number of mappings for a given variable in the exploratory analyses;
 will pick based on the highest count of the most commonly appearing variables;}
 
-\item{filter_variable}{for both \verb{single- and multi- site anomaly tests without time measurements} and
-\verb{single- and multi- site exploratory tests with time measurements}, the variables
-to focus on}
+\item{filter_variable}{\emph{string or vector} | the variable(s) to limit to for the analysis; used for all output types EXCEPT
+\code{ss_exp_cs}, \code{ms_exp_cs}, and \code{ms_anom_la}}
 
-\item{filter_concept}{for \code{ss_anom_la}, \code{ms_exp_la}, and \code{ms_anom_la}, the specific code that should
-be the focus of the analysis}
+\item{filter_concept}{\emph{numeric/string or vector} | the specific code(s) that should be the focus of the analysis; used for
+\code{ss_anom_la}, \code{ms_exp_la}, and \code{ms_anom_la}}
 
-\item{text_wrapping_char}{an integer to limit the length of text on an axis before wrapping is enforced;
-used in \code{ms_anom_cs}}
+\item{text_wrapping_char}{\emph{integer} | an integer to limit the length of text on an axis before wrapping is enforced;
+used for \code{ms_anom_cs}}
 
-\item{output_value}{the numerical column in \code{process_output} that should be used in the visualization
-relevant for \code{ss_exp_la}, \code{ms_anom_cs}, and \code{ms_exp_la}}
+\item{output_value}{\emph{string} | the name of the numerical column in \code{process_output} that should be used in the visualization
+used for \code{ss_exp_la}, \code{ms_anom_cs}, and \code{ms_exp_la}}
 }
 \value{
 a graph to visualize the results from \code{csd_process} based on the parameters provided; see documentation
@@ -108,7 +103,6 @@ csd_process_example
 
 #' Execute `csd_output` function
 csd_output_example <- csd_output(process_output = csd_process_example,
-                                 output_function = 'csd_ss_exp_cs',
                                  concept_set = csd_concept_tbl,
                                  vocab_tbl = NULL)
 
