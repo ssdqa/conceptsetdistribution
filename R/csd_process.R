@@ -126,12 +126,12 @@ csd_process <- function(cohort,
 
   }else{cli::cli_abort('Invalid argument for {.code omop_or_pcornet}: this function is only compatible with {.code omop} or {.code pcornet}')}
 
+  rslt_with_opt <- csd_rslt %>% mutate(output_function = output_type$string)
+
   cli::boxx(c('You can optionally use this dataframe in the accompanying',
   '`csd_output` function. Here are the parameters you will need:', '', output_type$vector, '',
   'See ?csd_output for more details.'), padding = c(0,1,0,1),
   header = cli::col_cyan('Output Function Details'))
-
-  rslt_with_opt <- csd_rslt %>% mutate(output_function = output_type$string)
 
   return(rslt_with_opt)
 
