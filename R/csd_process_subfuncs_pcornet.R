@@ -29,7 +29,7 @@ check_code_dist_csd_pcnt <- function(cohort_codedist,
 
 
   domain_filter <-
-    concept_set %>% select(domain) %>% distinct() %>%
+    concept_set %>% select(domain, variable) %>% distinct() %>%
     inner_join(domain_tbl)
   concept_set_db <- copy_to_new(df=concept_set, name='concept_set')
 
@@ -40,6 +40,7 @@ check_code_dist_csd_pcnt <- function(cohort_codedist,
     dates <- domain_filter$date_field[[i]]
 
     domain_tbl_name <- domain_filter$domain[[i]]
+    variable_name <- domain_filter$variable[[i]]
     domain_tbl_cdm <- cohort_codedist %>%
       inner_join(cdm_tbl(domain_tbl_name)) %>%
       filter(!!sym(dates) >= start_date,
@@ -59,7 +60,8 @@ check_code_dist_csd_pcnt <- function(cohort_codedist,
         domain_tbl_cdm %>%
         filter(!!sym(dates) >= time_start,
                !!sym(dates) <= time_end) %>%
-        inner_join(concept_set_db,
+        inner_join(concept_set_db %>% filter(domain == domain_tbl_name,
+                                             variable == variable_name),
                    by=join_cols) %>%
         select(all_of(group_vars(cohort_codedist)),
                all_of(final_col),
@@ -73,7 +75,8 @@ check_code_dist_csd_pcnt <- function(cohort_codedist,
     } else {
       fact_tbl <-
         domain_tbl_cdm %>%
-        inner_join(concept_set_db,
+        inner_join(concept_set_db %>% filter(domain == domain_tbl_name,
+                                             variable == variable_name),
                    by=join_cols) %>%
         select(all_of(group_vars(cohort_codedist)),
                all_of(final_col),
