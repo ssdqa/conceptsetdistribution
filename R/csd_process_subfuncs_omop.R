@@ -48,8 +48,8 @@ check_code_dist_csd_omop <- function(cohort_codedist,
 
     domain_tbl_name <- domain_filter$domain[[i]] #%>% pull
     variable_name <- domain_filter$variable[[i]]
-    domain_tbl_cdm <- cohort_codedist %>%
-      inner_join(cdm_tbl(domain_tbl_name)) %>%
+    domain_tbl_cdm <- cdm_tbl(domain_tbl_name) %>%
+      inner_join(cohort_codedist) %>%
       filter(!!sym(dates) >= start_date,
              !!sym(dates) <= end_date)
     final_col <- domain_filter$concept_field[[i]]
@@ -188,9 +188,9 @@ check_code_dist_ssanom_omop <- function(cohort_codedist,
           select(date_field) %>% pull()
 
         one_domain_tbl <-
-          cohort_codedist %>%
+          cdm_tbl(domain_name) %>%
           inner_join(
-            cdm_tbl(domain_name)
+            cohort_codedist
           ) %>%
           filter(!!sym(date_col) >= start_date,
                  !!sym(date_col) <= end_date) %>%
