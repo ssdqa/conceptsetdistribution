@@ -88,6 +88,7 @@ check_code_dist_csd_pcnt <- function(cohort_codedist,
     cts <-
       fact_tbl %>%
       group_by(
+        !!!syms(group_vars(cohort_codedist)),
         concept_code,
         variable,
         .add=TRUE

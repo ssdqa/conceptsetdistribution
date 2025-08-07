@@ -87,6 +87,7 @@ check_code_dist_csd_omop <- function(cohort_codedist,
     cts <-
       fact_tbl %>%
       group_by(
+        !!!syms(group_vars(cohort_codedist)),
         concept_id,
         variable,
         .add=TRUE
@@ -95,6 +96,9 @@ check_code_dist_csd_omop <- function(cohort_codedist,
       collect()
 
     fact_tbl_final[[i]] <- cts
+
+    rm(fact_tbl)
+    rm(domain_tbl_cdm)
   }
 
   fact_tbl_final_reduce <-
