@@ -4,7 +4,13 @@
 \alias{csd_ms_anom_la}
 \title{\strong{Multi-Site, Anomaly, Longitudinal}}
 \usage{
-csd_ms_anom_la(process_output, filter_concept, concept_col)
+csd_ms_anom_la(
+  process_output,
+  filter_concept,
+  concept_col,
+  large_n = FALSE,
+  large_n_sites = NULL
+)
 }
 \arguments{
 \item{process_output}{output from \code{csd_process}}
@@ -13,6 +19,11 @@ csd_ms_anom_la(process_output, filter_concept, concept_col)
 
 \item{concept_col}{the name of the column from the concept_set used to identify concepts
 should be either \code{concept_id} or \code{concept_code}}
+
+\item{large_n}{a boolean indicating whether the large N visualization, intended for a high
+volume of sites, should be used; defaults to FALSE}
+
+\item{large_n_sites}{a vector of site names that can optionally generate a filtered visualization}
 }
 \value{
 three graphs:

@@ -4,7 +4,14 @@
 \alias{csd_ms_exp_cs}
 \title{\emph{Multi Site, Exploratory, Cross-Sectional}}
 \usage{
-csd_ms_exp_cs(process_output, facet = NULL, concept_col, num_codes = 10)
+csd_ms_exp_cs(
+  process_output,
+  facet = NULL,
+  concept_col,
+  num_codes = 10,
+  large_n = FALSE,
+  large_n_sites = NULL
+)
 }
 \arguments{
 \item{process_output}{dataframe output by \code{csd_process}}
@@ -17,6 +24,11 @@ should be either \code{concept_id} or \code{concept_code}}
 
 \item{num_codes}{the number of top codes per variable that should be
 displayed in the table}
+
+\item{large_n}{a boolean indicating whether the large N visualization, intended for a high
+volume of sites, should be used; defaults to FALSE}
+
+\item{large_n_sites}{a vector of site names that can optionally generate a filtered visualization}
 }
 \value{
 a searchable and filterable table with mappings, proportion of representation, and

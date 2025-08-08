@@ -13,7 +13,9 @@ csd_output(
   filter_variable = NULL,
   filter_concept = NULL,
   text_wrapping_char = 80,
-  output_value = "prop_concept"
+  output_value = "prop_concept",
+  large_n = FALSE,
+  large_n_sites = NULL
 )
 }
 \arguments{
@@ -42,6 +44,11 @@ used for \code{ms_anom_cs}}
 
 \item{output_value}{\emph{string} | the name of the numerical column in \code{process_output} that should be used in the visualization
 used for \code{ss_exp_la}, \code{ms_anom_cs}, and \code{ms_exp_la}}
+
+\item{large_n}{\emph{boolean} | for multi site analyses, a boolean indicating whether the large N visualization, intended for a high
+volume of sites, should be used; defaults to FALSE}
+
+\item{large_n_sites}{\emph{vector} | when large_n = TRUE, a vector of site names that can optionally generate a filtered visualization}
 }
 \value{
 a graph to visualize the results from \code{csd_process} based on the parameters provided; see documentation
