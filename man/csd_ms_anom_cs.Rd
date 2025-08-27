@@ -9,7 +9,9 @@ csd_ms_anom_cs(
   concept_col,
   text_wrapping_char = 80,
   filtered_var,
-  comparison_col = "prop_concept"
+  comparison_col = "prop_concept",
+  large_n = FALSE,
+  large_n_sites = NULL
 )
 }
 \arguments{
@@ -26,6 +28,11 @@ that contains the variable names should be labeled \code{variable}}
 
 \item{comparison_col}{the column that computes the quantitative value for comparison across sites;
 in \code{csd} check, it is the \code{prop_concept}}
+
+\item{large_n}{a boolean indicating whether the large N visualization, intended for a high
+volume of sites, should be used; defaults to FALSE}
+
+\item{large_n_sites}{a vector of site names that can optionally generate a filtered visualization}
 }
 \value{
 a dot plot where the shape of the dot represents whether the point is

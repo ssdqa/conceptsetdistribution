@@ -15,6 +15,7 @@
 #' @importFrom utils head
 #' @importFrom purrr set_names
 #' @importFrom plotly layout
+#' @importFrom patchwork plot_layout
 #'
 NULL
 
@@ -401,6 +402,9 @@ csd_ss_exp_la <- function(process_output,
 #'                     in the output
 #' @param facet the variables by which you would like to facet the graph;
 #'              defaults to NULL
+#' @param large_n a boolean indicating whether the large N visualization, intended for a high
+#'                volume of sites, should be used; defaults to FALSE
+#' @param large_n_sites a vector of site names that can optionally generate a filtered visualization
 #'
 #' @return a line graph with one facet per code displaying the proportion of usage for
 #'         each site
@@ -412,7 +416,9 @@ csd_ms_exp_la <- function(process_output,
                           facet=NULL,
                           filtered_var,
                           filtered_concept,
-                          output_value='prop_concept'){
+                          output_value='prop_concept',
+                          large_n = FALSE,
+                          large_n_sites = NULL){
 
   output_value <- output_value
   concept_col <- concept_col
@@ -436,31 +442,95 @@ csd_ms_exp_la <- function(process_output,
                       "\nValue: ",!!sym(output_value),
                       "\nTime Point: ", time_start))
 
+  if(!large_n){
 
-  ref_tbl <- generate_ref_table(tbl = dat_to_plot %>%
-                                  #mutate(concept_id=as.integer(concept_id)) %>%
-                                  group_by(site),
-                                id_col = concept_col,
-                                denom = 'ct_concept',
-                                name_col = 'concept_name',
-                                time = TRUE)
+    ref_tbl <- generate_ref_table(tbl = dat_to_plot %>%
+                                    #mutate(concept_id=as.integer(concept_id)) %>%
+                                    group_by(site),
+                                  id_col = concept_col,
+                                  denom = 'ct_concept',
+                                  name_col = 'concept_name',
+                                  time = TRUE)
 
-  p <-dat_to_plot %>%
-    mutate(concept_id=as.character(!!sym(concept_col))) %>%
-    ggplot(aes(y = !!sym(output_value), x = time_start, color = site,
-               group=site, text=text)) +
-    geom_line() +
-    facet_wrap((facet)) +
-    labs(title = paste0('Concepts per Site Over Time'),
-         color = 'Site',
-         y = 'Proportion',
-         x = 'Time') +
-    theme_minimal() +
-    scale_color_squba()
+    p <-dat_to_plot %>%
+      mutate(concept_id=as.character(!!sym(concept_col))) %>%
+      ggplot(aes(y = !!sym(output_value), x = time_start, color = site,
+                 group=site, text=text)) +
+      geom_line() +
+      facet_wrap((facet)) +
+      labs(title = paste0('Concepts per Site Over Time'),
+           color = 'Site',
+           y = 'Proportion',
+           x = 'Time') +
+      theme_minimal() +
+      scale_color_squba()
+
+  }else{
+
+    summ_stats <- dat_to_plot %>%
+      group_by(concept_id_label, variable, !!sym(concept_col),
+               concept_name, time_start) %>%
+      summarise(allsite_median = stats::median(!!sym(output_value)),
+                allsite_q1 = stats::quantile(!!sym(output_value), 0.25),
+                allsite_q3 = stats::quantile(!!sym(output_value), 0.75)) %>%
+      pivot_longer(cols = !c(concept_id_label, variable, !!sym(concept_col),
+                             concept_name, time_start),
+                   names_to = 'site',
+                   values_to = output_value) %>%
+      mutate(site = case_when(site == 'allsite_median' ~ 'All Site Median',
+                              site == 'allsite_q1' ~ 'All Site Q1',
+                              site == 'allsite_q3' ~ 'All Site Q3'),
+             text = paste("Concept: ",!!sym(concept_col),
+                          "\nConcept Name: ",concept_name,
+                          "\nSite: ",site,
+                          "\nValue: ",!!sym(output_value),
+                          "\nTime Point: ", time_start))
+
+    if(!is.null(large_n_sites)){
+      a <- 0.5
+      lt <- 'dashed'
+    }else{
+      a <- 1
+      lt <- 'solid'}
+
+    p <- summ_stats %>%
+      mutate(concept_id=as.character(!!sym(concept_col))) %>%
+      ggplot(aes(y = !!sym(output_value), x = time_start, color = site,
+                 group=site, text=text)) +
+      geom_line(linewidth = 1, alpha = a, linetype = lt) +
+      facet_wrap((facet)) +
+      labs(title = paste0('Concepts per Site Over Time'),
+           color = 'Site',
+           y = 'Proportion',
+           x = 'Time') +
+      theme_minimal() +
+      scale_color_squba()
+
+    if(!is.null(large_n_sites)){
+      p <- p + geom_line(data = dat_to_plot %>% filter(site %in% large_n_sites),
+                         linewidth = 1)
+
+      ref_tbl <- generate_ref_table(tbl = dat_to_plot %>%
+                                      filter(site %in% large_n_sites) %>%
+                                      group_by(site),
+                                    id_col = concept_col,
+                                    denom = 'ct_concept',
+                                    name_col = 'concept_name',
+                                    time = TRUE)
+    }else{
+      ref_tbl <- generate_ref_table(tbl = dat_to_plot %>%
+                                      mutate(site = 'all sites') %>%
+                                      group_by(site),
+                                    id_col = concept_col,
+                                    denom = 'ct_concept',
+                                    name_col = 'concept_name',
+                                    time = TRUE)
+    }
+
+  }
 
   p[["metadata"]] <- tibble('pkg_backend' = 'plotly',
                             'tooltip' = TRUE)
-
 
   output <- list(p, ref_tbl)
 
@@ -478,6 +548,10 @@ csd_ms_exp_la <- function(process_output,
 #'                    should be either `concept_id` or `concept_code`
 #' @param num_codes the number of top codes per variable that should be
 #'                  displayed in the table
+#' @param large_n a boolean indicating whether the large N visualization, intended for a high
+#'                volume of sites, should be used; defaults to FALSE
+#' @param large_n_sites a vector of site names that can optionally generate a filtered visualization
+#'
 #'
 #' @return a searchable and filterable table with mappings, proportion of representation, and
 #'         denominator counts for the number of codes selected
@@ -486,20 +560,49 @@ csd_ms_exp_la <- function(process_output,
 csd_ms_exp_cs <- function(process_output,
                           facet = NULL,
                           concept_col,
-                          num_codes = 10){
+                          num_codes = 10,
+                          large_n = FALSE,
+                          large_n_sites = NULL){
 
   # picking columns / titles
 
-    denom <-  'ct_denom'
-    col <- 'variable'
-    map_col <- concept_col
-    prop <- 'prop_concept'
-    ct = 'ct_concept'
+  denom <-  'ct_denom'
+  col <- 'variable'
+  map_col <- concept_col
+  prop <- 'prop_concept'
+  ct = 'ct_concept'
 
   ## Enfore site facetting
   facet <- facet %>% append('site') %>% unique()
 
   ## filter output down to most common codes, selecting a user-provided number
+
+  if(large_n & is.null(large_n_sites)){
+    process_output <- process_output %>%
+      mutate(site = 'all sites') %>%
+      group_by(variable, !!sym(concept_col)) %>%
+      mutate(min_ct = min(prop_concept),
+             max_ct = max(prop_concept),
+             site_range = paste0(min_ct*100, '% - ', max_ct*100, '%')) %>%
+      group_by(site, variable) %>%
+      mutate(ct_denom = sum(ct_denom)) %>%
+      group_by(site, variable, !!sym(concept_col), ct_denom, concept_name,
+               site_range) %>%
+      summarise(ct_concept = sum(ct_concept)) %>%
+      mutate(prop_concept = ct_concept / ct_denom)
+
+    select_cols <- c(facet, 'variable', map_col, 'concept_name', ct, prop, 'site_range')
+  }else if(large_n & !is.null(large_n_sites)){
+    process_output <- process_output %>%
+      group_by(variable, !!sym(concept_col)) %>%
+      mutate(allsite_median = stats::median(prop_concept)) %>%
+      ungroup() %>%
+      filter(site %in% large_n_sites)
+
+    select_cols <- c(facet, 'variable', map_col, 'concept_name', ct, prop, 'allsite_median')
+  }else if(!large_n){
+    select_cols <- c(facet, 'variable', map_col, 'concept_name', ct, prop)
+  }
 
   topcodes <- process_output %>%
     ungroup() %>%
@@ -519,17 +622,33 @@ csd_ms_exp_cs <- function(process_output,
     mutate(pct = !!sym(prop)) %>%
     arrange(!!!syms(facet), desc(ct)) %>%
     #relocate(site) %>%
-    select(!!!syms(facet), variable, !!sym(map_col), concept_name, !!sym(ct), !!sym(prop), pct) %>%
+    select(!!!syms(select_cols), pct) %>%
     gt::gt() %>%
-    cols_nanoplot(columns = pct, plot_type = 'bar',
-                  autohide = TRUE, new_col_label = 'percent') %>%
-    #gtExtras::gt_plt_bar_pct(column = pct) %>%
     fmt_number(columns = ct, decimals = 0) %>%
     fmt_percent(columns = prop, decimals = 0) %>%
     data_color(palette = squba_colors_standard, columns = c(all_of(facet))) %>%
     tab_header(title = paste0('All Available Mappings for Top ', num_codes, ' Variables')) %>%
     opt_interactive(use_search = TRUE,
                     use_filters = TRUE)
+
+  if(!large_n){
+    table <- table %>%
+      cols_nanoplot(columns = pct, plot_type = 'bar',
+                    autohide = TRUE, new_col_label = 'percent')
+  }else if(large_n & is.null(large_n_sites)){
+    table <- table %>%
+      cols_nanoplot(columns = pct, plot_type = 'bar',
+                    autohide = TRUE, new_col_label = 'percent') %>%
+      cols_label('site_range' = 'site range') %>%
+      cols_move_to_end('site_range')
+  }else if(large_n & !is.null(large_n_sites)){
+    table <- table %>%
+      cols_nanoplot(columns = c(pct, 'allsite_median'), plot_type = 'bar',
+                    autohide = TRUE, new_col_label = 'compared to all-site median',
+                    options =
+                      nanoplot_options(data_bar_fill_color = c(squba_colors_standard[2],
+                                                               squba_colors_standard[3])))
+  }
 
 
   return(table)
@@ -548,6 +667,9 @@ csd_ms_exp_cs <- function(process_output,
 #'                     that contains the variable names should be labeled `variable`
 #' @param comparison_col the column that computes the quantitative value for comparison across sites;
 #'                       in `csd` check, it is the `prop_concept`
+#' @param large_n a boolean indicating whether the large N visualization, intended for a high
+#'                volume of sites, should be used; defaults to FALSE
+#' @param large_n_sites a vector of site names that can optionally generate a filtered visualization
 #'
 #' @return a dot plot where the shape of the dot represents whether the point is
 #'         anomalous, the color of the dot represents the proportion of usage for
@@ -559,14 +681,16 @@ csd_ms_anom_cs<-function(process_output,
                          concept_col,
                          text_wrapping_char=80,
                          filtered_var,
-                         comparison_col='prop_concept'){
+                         comparison_col='prop_concept',
+                         large_n = FALSE,
+                         large_n_sites = NULL){
 
   cname_samp <- process_output %>% head(1) %>% select(concept_name) %>% pull()
   concept_col <- concept_col
 
   if(cname_samp == 'No vocabulary table input'){
     concept_label <- concept_col
-    }else{concept_label <- 'concept_name'}
+  }else{concept_label <- 'concept_name'}
 
   comparison_col = comparison_col
 
@@ -581,79 +705,202 @@ csd_ms_anom_cs<-function(process_output,
                       '\nSD: ', round(sd_val,2),
                       "\nMedian proportion: ",round(median_val,2),
                       "\nMAD: ", round(mad_val,2)))
+  if(!large_n){
+    if(nrow(check_n) > 0){
 
-  if(nrow(check_n) > 0){
+      dat_to_plot <- dat_to_plot %>% filter(variable == filtered_var) %>%
+        mutate(anomaly_yn = ifelse(anomaly_yn == 'no outlier in group', 'not outlier', anomaly_yn))
 
-    dat_to_plot <- dat_to_plot %>% filter(variable == filtered_var) %>%
-      mutate(anomaly_yn = ifelse(anomaly_yn == 'no outlier in group', 'not outlier', anomaly_yn))
+      plt <-
+        ggplot(dat_to_plot, aes(x=site, y=as.character(!!sym(concept_col)), text=text, color=!!sym(comparison_col)))+
+        geom_point_interactive(aes(size=mean_val,shape=anomaly_yn, tooltip = text))+
+        geom_point_interactive(data = dat_to_plot %>% filter(anomaly_yn == 'not outlier'),
+                               aes(size=mean_val,shape=anomaly_yn, tooltip = text), shape = 1, color = 'black')+
+        scale_color_squba(palette = 'diverging', discrete = FALSE) +
+        scale_shape_manual(values=c(19,8))+
+        scale_y_discrete(labels = function(x) str_wrap(x, width = text_wrapping_char)) +
+        theme_minimal() +
+        #theme(axis.text.x = element_text(angle=60, hjust = 1, vjust = 1)) +
+        labs(y = "Concept",
+             size="",
+             title=paste0('Anomalous Concepts for ', filtered_var, ' per Site'),
+             subtitle = 'Dot size is the mean proportion per concept') +
+        guides(color = guide_colorbar(title = 'Proportion'),
+               shape = guide_legend(title = 'Anomaly'),
+               size = 'none')
 
-    plt <-
-      ggplot(dat_to_plot, aes(x=site, y=as.character(!!sym(concept_col)), text=text, color=!!sym(comparison_col)))+
-      geom_point_interactive(aes(size=mean_val,shape=anomaly_yn, tooltip = text))+
-      geom_point_interactive(data = dat_to_plot %>% filter(anomaly_yn == 'not outlier'),
-                             aes(size=mean_val,shape=anomaly_yn, tooltip = text), shape = 1, color = 'black')+
-      scale_color_squba(palette = 'diverging', discrete = FALSE) +
-      scale_shape_manual(values=c(19,8))+
-      scale_y_discrete(labels = function(x) str_wrap(x, width = text_wrapping_char)) +
-      theme_minimal() +
-      #theme(axis.text.x = element_text(angle=60, hjust = 1, vjust = 1)) +
-      labs(y = "Concept",
-           size="",
-           title=paste0('Anomalous Concepts for ', filtered_var, ' per Site'),
-           subtitle = 'Dot size is the mean proportion per concept') +
-      guides(color = guide_colorbar(title = 'Proportion'),
-             shape = guide_legend(title = 'Anomaly'),
-             size = 'none')
+      plt[["metadata"]] <- tibble('pkg_backend' = 'ggiraph',
+                                  'tooltip' = TRUE)
 
-    plt[["metadata"]] <- tibble('pkg_backend' = 'ggiraph',
-                                'tooltip' = TRUE)
+      return(plt)
 
-    return(plt)
+    }else{
 
+      plt <- ggplot(dat_to_plot, aes(x = site, y = as.character(!!sym(concept_col)),
+                                     fill = !!sym(comparison_col),
+                                     tooltip = text)) +
+        geom_tile_interactive() +
+        theme_minimal() +
+        scale_fill_squba(discrete = FALSE, palette = 'diverging') +
+        labs(y = 'Concept',
+             x = 'Site',
+             fill = 'Proportion')
+
+      # Test Site Score using SD Computation
+      test_site_score <- process_output %>%
+        mutate(dist_mean = (!!sym(comparison_col) - mean_val)^2) %>%
+        group_by(site) %>%
+        summarise(n_grp = n(),
+                  dist_mean_sum = sum(dist_mean),
+                  overall_sd = sqrt(dist_mean_sum / n_grp)) %>%
+        mutate(tooltip = paste0('Site: ', site,
+                                '\nStandard Deviation: ', round(overall_sd, 3)))
+
+      ylim_max <- test_site_score %>% filter(overall_sd == max(overall_sd)) %>% pull(overall_sd) + 1
+      ylim_min <- test_site_score %>% filter(overall_sd == min(overall_sd)) %>% pull(overall_sd) - 1
+
+      g2 <- ggplot(test_site_score, aes(y = overall_sd, x = site, color = site,
+                                        tooltip = tooltip)) +
+        geom_point_interactive(show.legend = FALSE) +
+        theme_minimal() +
+        scale_color_squba() +
+        geom_hline(yintercept = 0, linetype = 'solid') +
+        labs(title = 'Average Standard Deviation per Site',
+             y = 'Average Standard Deviation',
+             x = 'Site')
+
+      plt[["metadata"]] <- tibble('pkg_backend' = 'ggiraph',
+                                  'tooltip' = TRUE)
+      g2[["metadata"]] <- tibble('pkg_backend' = 'ggiraph',
+                                 'tooltip' = TRUE)
+
+      opt <- list(plt,
+                  g2)
+
+      return(opt)
+    }
   }else{
+    suppressWarnings(
+      far_site <- process_output %>%
+        filter(variable == filtered_var) %>%
+        mutate(zscr = (!!sym(comparison_col) - mean_val) / sd_val,
+               zscr = ifelse(is.nan(zscr), NA, zscr),
+               zscr = abs(zscr)) %>%
+        group_by(variable, !!sym(concept_col)) %>%
+        filter(zscr == max(zscr, na.rm = TRUE)) %>%
+        summarise(farthest_site = site,
+                  nvar = n())
 
-    plt <- ggplot(dat_to_plot, aes(x = site, y = as.character(!!sym(concept_col)),
-                                   fill = !!sym(comparison_col),
-                                   tooltip = text)) +
-      geom_tile_interactive() +
-      theme_minimal() +
-      scale_fill_squba(discrete = FALSE, palette = 'diverging') +
-      labs(y = 'Concept',
-           x = 'Site',
-           fill = 'Proportion')
+    )
 
-    # Test Site Score using SD Computation
-    test_site_score <- process_output %>%
-      mutate(dist_mean = (!!sym(comparison_col) - mean_val)^2) %>%
-      group_by(site) %>%
-      summarise(n_grp = n(),
-                dist_mean_sum = sum(dist_mean),
-                overall_sd = sqrt(dist_mean_sum / n_grp)) %>%
-      mutate(tooltip = paste0('Site: ', site,
-                              '\nStandard Deviation: ', round(overall_sd, 3)))
+    if(any(far_site$nvar > 1)){
+      far_site <- far_site %>%
+        summarise_all(toString) %>% select(-nvar)
+    }else{
+      far_site <- far_site %>% select(-nvar)
+    }
 
-    ylim_max <- test_site_score %>% filter(overall_sd == max(overall_sd)) %>% pull(overall_sd) + 1
-    ylim_min <- test_site_score %>% filter(overall_sd == min(overall_sd)) %>% pull(overall_sd) - 1
+    suppressWarnings(
+      close_site <- process_output %>%
+        filter(variable == filtered_var) %>%
+        mutate(zscr = (!!sym(comparison_col) - mean_val) / sd_val,
+               zscr = ifelse(is.nan(zscr), NA, zscr),
+               zscr = abs(zscr)) %>%
+        group_by(variable, !!sym(concept_col)) %>%
+        filter(zscr == min(zscr, na.rm = TRUE)) %>%
+        summarise(closest_site = site,
+                  nvar = n())
+    )
 
-    g2 <- ggplot(test_site_score, aes(y = overall_sd, x = site, color = site,
-                                      tooltip = tooltip)) +
-      geom_point_interactive(show.legend = FALSE) +
-      theme_minimal() +
-      scale_color_squba() +
-      geom_hline(yintercept = 0, linetype = 'solid') +
-      labs(title = 'Average Standard Deviation per Site',
-           y = 'Average Standard Deviation',
-           x = 'Site')
+    if(any(close_site$nvar > 1)){
+      close_site <- close_site %>%
+        summarise_all(toString) %>% select(-nvar)
+    }else{
+      close_site <- close_site %>% select(-nvar)
+    }
 
-    plt[["metadata"]] <- tibble('pkg_backend' = 'ggiraph',
-                                'tooltip' = TRUE)
-    g2[["metadata"]] <- tibble('pkg_backend' = 'ggiraph',
-                               'tooltip' = TRUE)
+    nsite_anom <- process_output %>%
+      filter(variable == filtered_var) %>%
+      group_by(variable, !!sym(concept_col), anomaly_yn) %>%
+      summarise(site_w_anom = n_distinct(site)) %>%
+      filter(anomaly_yn == 'outlier') %>%
+      ungroup() %>%
+      select(-anomaly_yn)
 
-    opt <- list(plt,
-                g2)
+    sitesanoms <- process_output %>%
+      filter(variable == filtered_var) %>%
+      filter(anomaly_yn == 'outlier') %>%
+      group_by(variable, !!sym(concept_col)) %>%
+      summarise(site_anoms = toString(site)) %>%
+      select(variable, !!sym(concept_col), site_anoms)
 
-    return(opt)
+    tbl <- process_output %>%
+      filter(variable == filtered_var) %>%
+      group_by(variable, !!sym(concept_col)) %>%
+      mutate(iqr_val = stats::IQR(!!sym(comparison_col))) %>%
+      ungroup() %>%
+      distinct(variable, !!sym(concept_col), !!sym(concept_label),
+               mean_val, sd_val, median_val, iqr_val) %>%
+      left_join(nsite_anom) %>%
+      left_join(sitesanoms) %>%
+      left_join(far_site) %>%
+      left_join(close_site) %>%
+      mutate(delim = sub("^([^,]+,){5}([^,]+).*", "\\2", site_anoms),
+             site_anoms = ifelse(site_w_anom > 5,
+                                 stringr::str_replace(site_anoms, paste0(",", delim, '(.*)'), ' . . .'),
+                                 site_anoms)) %>%
+      select(-delim) %>%
+      gt::gt() %>%
+      tab_header('Large N Anomaly Detection Summary Table') %>%
+      cols_label(variable = 'Variable',
+                 site_anoms = 'Site(s) with Anomaly',
+                 mean_val = 'Mean',
+                 sd_val = 'Standard Deviation',
+                 median_val = 'Median',
+                 iqr_val = 'IQR',
+                 site_w_anom = 'No. Sites w/ Anomaly',
+                 farthest_site = 'Site(s) Farthest from Mean',
+                 closest_site = 'Site(s) Closest to Mean') %>%
+      sub_missing(missing_text = 0,
+                  columns = site_w_anom) %>%
+      sub_missing(missing_text = '--',
+                  columns = c(farthest_site, closest_site, site_anoms)) %>%
+      fmt_number(columns = c(mean_val, median_val, sd_val, iqr_val),
+                 decimals = 3) %>%
+      opt_stylize(style = 2)
+
+    if(!is.null(large_n_sites)){
+      dat_to_plot <- dat_to_plot %>% filter(site %in% large_n_sites) %>%
+        mutate(anomaly_yn = ifelse(anomaly_yn == 'no outlier in group', 'not outlier', anomaly_yn))
+
+      plt<-ggplot(dat_to_plot,
+                  aes(x=site, y=as.character(!!sym(concept_col)), text=text, color=!!sym(comparison_col)))+
+        geom_point_interactive(aes(size=mean_val,shape=anomaly_yn, tooltip = text))+
+        geom_point_interactive(data = dat_to_plot %>% filter(anomaly_yn == 'not outlier'),
+                               aes(size=mean_val,shape=anomaly_yn, tooltip = text), shape = 1, color = 'black')+
+        scale_color_squba(palette = 'diverging', discrete = FALSE) +
+        scale_shape_manual(values=c(19,8))+
+        scale_y_discrete(labels = function(x) str_wrap(x, width = text_wrapping_char)) +
+        theme_minimal() +
+        #theme(axis.text.x = element_text(angle=60, hjust = 1, vjust = 1)) +
+        labs(y = "Concept",
+             size="",
+             title=paste0('Anomalous Concepts for ', filtered_var, ' per Site'),
+             subtitle = 'Dot size is the mean proportion per concept') +
+        guides(color = guide_colorbar(title = 'Proportion'),
+               shape = guide_legend(title = 'Anomaly'),
+               size = 'none')
+
+      plt[['metadata']] <- tibble('pkg_backend' = 'ggiraph',
+                                  'tooltip' = TRUE)
+
+      opt <- list(plt,
+                  tbl)
+
+      return(opt)
+    }else{
+      return(tbl)
+    }
   }
 
 }
@@ -664,6 +911,10 @@ csd_ms_anom_cs<-function(process_output,
 #' @param filter_concept the concept_id that should be used for the output
 #' @param concept_col the name of the column from the concept_set used to identify concepts
 #'                    should be either `concept_id` or `concept_code`
+#' @param large_n a boolean indicating whether the large N visualization, intended for a high
+#'                volume of sites, should be used; defaults to FALSE
+#' @param large_n_sites a vector of site names that can optionally generate a filtered visualization
+#'
 #' @return three graphs:
 #'    1) Loess smoothed line graph that shows the proportion of a code across time
 #'    with the Euclidean Distance associated with each line
@@ -676,7 +927,9 @@ csd_ms_anom_cs<-function(process_output,
 
 csd_ms_anom_la <- function(process_output,
                            filter_concept,
-                           concept_col){
+                           concept_col,
+                           large_n = FALSE,
+                           large_n_sites = NULL){
 
   concept_col <- concept_col
   filt_op <- process_output %>% filter(!!sym(concept_col) == filter_concept)
@@ -687,77 +940,136 @@ csd_ms_anom_la <- function(process_output,
     rename(prop_concept=mean_allsiteprop) %>%
     mutate(site='all site average') %>%
     mutate(text_smooth=paste0("Site: ", site,
-                       "\n","Proportion: ",prop_concept),
+                              "\n","Proportion: ",prop_concept),
            text_raw=paste0("Site: ", site,
                            "\n","Proportion: ",prop_concept))
+
+  iqr_dat <- filt_op %>%
+    select(time_start,!!sym(concept_col),prop_concept) %>% distinct() %>%
+    group_by(time_start, !!sym(concept_col)) %>%
+    summarise(q1 = stats::quantile(prop_concept, 0.25),
+              q3 = stats::quantile(prop_concept, 0.75))
 
   dat_to_plot <-
     filt_op %>%
     mutate(text_smooth=paste0("Site: ", site,
-                       "\n","Euclidean Distance from All-Site Mean: ",dist_eucl_mean),
+                              "\n","Euclidean Distance from All-Site Mean: ",dist_eucl_mean),
            text_raw=paste0("Site: ", site,
                            "\n","Site Proportion: ",prop_concept,
                            "\n","Site Smoothed Proportion: ",site_loess,
                            "\n","Euclidean Distance from All-Site Mean: ",dist_eucl_mean))
 
-  p <- dat_to_plot %>%
-    ggplot(aes(y = prop_concept, x = time_start, color = site, group = site, text = text_smooth)) +
-    geom_line(data=allsites, linewidth=1.1) +
-    geom_smooth(se=TRUE,alpha=0.1,linewidth=0.5, formula = y ~ x) +
-    scale_color_squba() +
-    theme_minimal() +
-    #theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust=1)) +
-    labs(y = 'Proportion (Loess)',
-         x = 'Time',
-         title = paste0('Smoothed Proportion of ', filter_concept, ' Across Time'))
+  if(!large_n){
+    p <- dat_to_plot %>%
+      ggplot(aes(y = prop_concept, x = time_start, color = site, group = site, text = text_smooth)) +
+      geom_line(data=allsites, linewidth=1.1) +
+      geom_smooth(se=TRUE,alpha=0.1,linewidth=0.5, formula = y ~ x) +
+      scale_color_squba() +
+      theme_minimal() +
+      labs(y = 'Proportion (Loess)',
+           x = 'Time',
+           title = paste0('Smoothed Proportion of ', filter_concept, ' Across Time'))
 
-  q <- dat_to_plot %>%
-    ggplot(aes(y = prop_concept, x = time_start, color = site,
-               group=site, text=text_raw)) +
-    scale_color_squba() +
-    geom_line(data=allsites,linewidth=1.1) +
-    geom_line(linewidth=0.2) +
-    theme_minimal() +
-    #theme(axis.text.x = element_text(angle = 30, vjust = 1, hjust=1)) +
-    labs(x = 'Time',
-         y = 'Proportion',
-         title = paste0('Proportion of ', filter_concept, ' Across Time'))
+    q <- dat_to_plot %>%
+      ggplot(aes(y = prop_concept, x = time_start, color = site,
+                 group=site, text=text_raw)) +
+      scale_color_squba() +
+      geom_line(data=allsites,linewidth=1.1) +
+      geom_line(linewidth=0.2) +
+      theme_minimal() +
+      labs(x = 'Time',
+           y = 'Proportion',
+           title = paste0('Proportion of ', filter_concept, ' Across Time'))
 
-  t <- dat_to_plot %>%
-    distinct(site, dist_eucl_mean, site_loess) %>%
-    group_by(site, dist_eucl_mean) %>%
-    summarise(mean_site_loess = mean(site_loess)) %>%
-    mutate(tooltip = paste0('Site: ', site,
-                            '\nEuclidean Distance: ', dist_eucl_mean,
-                            '\nAverage Loess Proportion: ', mean_site_loess)) %>%
-    ggplot(aes(x = site, y = dist_eucl_mean, fill = mean_site_loess, tooltip = tooltip)) +
-    geom_col_interactive() +
-    # geom_text(aes(label = dist_eucl_mean), vjust = 2, size = 3,
-    #           show.legend = FALSE) +
-    coord_radial(r.axis.inside = FALSE, rotate.angle = TRUE) +
-    guides(theta = guide_axis_theta(angle = 0)) +
-    theme_minimal() +
-    scale_fill_squba(palette = 'diverging', discrete = FALSE) +
-    # theme(legend.position = 'bottom',
-    #       legend.text = element_text(angle = 45, vjust = 0.9, hjust = 1),
-    #       axis.text.x = element_text(face = 'bold'))
-    labs(fill = 'Avg. Proportion \n(Loess)',
-         y ='Euclidean Distance',
-         x = '',
-         title = paste0('Euclidean Distance for ', filter_concept))
+    t <- dat_to_plot %>%
+      distinct(site, dist_eucl_mean, site_loess) %>%
+      group_by(site, dist_eucl_mean) %>%
+      summarise(mean_site_loess = mean(site_loess)) %>%
+      mutate(tooltip = paste0('Site: ', site,
+                              '\nEuclidean Distance: ', dist_eucl_mean,
+                              '\nAverage Loess Proportion: ', mean_site_loess)) %>%
+      ggplot(aes(x = site, y = dist_eucl_mean, fill = mean_site_loess, tooltip = tooltip)) +
+      geom_segment(aes(x = site, xend = site, y = 0, yend = dist_eucl_mean), color = 'navy') +
+      geom_point_interactive(aes(fill = mean_site_loess), shape = 21, size = 4) +
+      coord_radial(r.axis.inside = FALSE, rotate.angle = TRUE) +
+      guides(theta = guide_axis_theta(angle = 0)) +
+      theme_minimal() +
+      scale_fill_squba(palette = 'diverging', discrete = FALSE) +
+      labs(fill = 'Avg. Proportion \n(Loess)',
+           y ='Euclidean Distance',
+           x = '',
+           title = paste0('Euclidean Distance for ', filter_concept))
 
-  p[['metadata']] <- tibble('pkg_backend' = 'plotly',
-                            'tooltip' = TRUE)
+    p[['metadata']] <- tibble('pkg_backend' = 'plotly',
+                              'tooltip' = TRUE)
 
-  q[['metadata']] <- tibble('pkg_backend' = 'plotly',
-                            'tooltip' = TRUE)
+    q[['metadata']] <- tibble('pkg_backend' = 'plotly',
+                              'tooltip' = TRUE)
 
-  t[['metadata']] <- tibble('pkg_backend' = 'ggiraph',
-                            'tooltip' = TRUE)
+    t[['metadata']] <- tibble('pkg_backend' = 'ggiraph',
+                              'tooltip' = TRUE)
 
-  output <- list(p,
-                 q,
-                 t)
+    output <- list(p,
+                   q,
+                   t)
+  }else{
+    q <- ggplot(allsites, aes(x = time_start)) +
+      geom_ribbon(data = iqr_dat, aes(ymin = q1, ymax = q3), alpha = 0.2) +
+      geom_line(aes(y = prop_concept, color = site, group = site), linewidth=1.1) +
+      geom_point_interactive(aes(y = prop_concept, color = site, group = site, tooltip=text_raw)) +
+      theme_minimal() +
+      scale_color_squba() +
+      labs(x = 'Time',
+           y = 'Proportion',
+           title = paste0('Proportion of ', filter_concept, ' Across Time'),
+           subtitle = 'Ribbon boundaries are IQR')
+
+    if(is.null(large_n_sites)){
+
+      t <- dat_to_plot %>%
+        distinct(!!sym(concept_col), dist_eucl_mean) %>%
+        ggplot(aes(x = dist_eucl_mean, y = !!sym(concept_col))) +
+        geom_boxplot() +
+        geom_point_interactive(color = 'gray',alpha = 0.75,
+                               aes(tooltip = dist_eucl_mean)) +
+        theme_minimal() +
+        theme(axis.text.y = element_blank(),
+              legend.title = element_blank()) +
+        scale_fill_squba(palette = 'diverging', discrete = FALSE) +
+        labs(x ='Euclidean Distance',
+             y = '',
+             title = paste0('Distribution of Euclidean Distances'))
+
+    }else{
+      q <- q + geom_line(data = dat_to_plot %>% filter(site %in% large_n_sites),
+                         aes(y = prop_concept, color = site, group = site),
+                         linewidth=0.2) +
+        geom_point_interactive(data = dat_to_plot %>% filter(site %in% large_n_sites),
+                               aes(y = prop_concept, color = site, group = site, tooltip=text_raw))
+
+      t <- dat_to_plot %>%
+        distinct(!!sym(concept_col),dist_eucl_mean) %>%
+        ggplot(aes(x = dist_eucl_mean, y = !!sym(concept_col))) +
+        geom_boxplot() +
+        geom_point_interactive(data = dat_to_plot %>% filter(site %in% large_n_sites),
+                               aes(color = site, tooltip = dist_eucl_mean)) +
+        theme_minimal() +
+        theme(axis.text.y = element_blank(),
+              legend.title = element_blank()) +
+        scale_fill_squba(palette = 'diverging', discrete = FALSE) +
+        scale_color_squba() +
+        labs(x ='Euclidean Distance',
+             y = '',
+             title = paste0('Distribution of Euclidean Distances'))
+    }
+
+    q[['metadata']] <- tibble('pkg_backend' = 'ggiraph',
+                              'tooltip' = TRUE)
+    t[['metadata']] <- tibble('pkg_backend' = 'ggiraph',
+                              'tooltip' = TRUE)
+
+    output <- q + t + plot_layout(ncol = 1, heights = c(5, 1))
+  }
 
   return(output)
 }

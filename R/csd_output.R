@@ -23,6 +23,9 @@
 #'                           used for `ms_anom_cs`
 #' @param output_value *string* | the name of the numerical column in `process_output` that should be used in the visualization
 #'                     used for `ss_exp_la`, `ms_anom_cs`, and `ms_exp_la`
+#' @param large_n *boolean* | for multi site analyses, a boolean indicating whether the large N visualization, intended for a high
+#'                volume of sites, should be used; defaults to FALSE
+#' @param large_n_sites *vector* | when large_n = TRUE, a vector of site names that can optionally generate a filtered visualization
 #'
 #' @return a graph to visualize the results from `csd_process` based on the parameters provided; see documentation
 #'         for individual subfunctions for details on specific output
@@ -41,7 +44,9 @@ csd_output <- function(process_output,
                        filter_concept = NULL,
                        #facet=NULL,
                        text_wrapping_char = 80,
-                       output_value = 'prop_concept'){
+                       output_value = 'prop_concept',
+                       large_n = FALSE,
+                       large_n_sites = NULL){
 
   ## extract output function
   output_function <- process_output %>% collect() %>% distinct(output_function) %>% pull()
@@ -98,25 +103,32 @@ csd_output <- function(process_output,
     csd_output <- csd_ms_exp_cs(process_output=process_output,
                                 concept_col = concept_col,
                                 facet=facet,
-                                num_codes = num_variables)
+                                num_codes = num_variables,
+                                large_n = large_n,
+                                large_n_sites = large_n_sites)
   }else if(output_function == 'csd_ms_anom_cs'){
     csd_output <- csd_ms_anom_cs(process_output=process_output,
                                  concept_col = concept_col,
                                  text_wrapping_char=text_wrapping_char,
                                  filtered_var=filter_variable,
-                                 comparison_col=output_value)
+                                 comparison_col=output_value,
+                                 large_n = large_n,
+                                 large_n_sites = large_n_sites)
   }else if(output_function == 'csd_ms_exp_la'){
     csd_output <- csd_ms_exp_la(process_output = process_output,
                                 concept_col = concept_col,
                                 filtered_var = filter_variable,
                                 filtered_concept = filter_concept,
                                 output_value = output_value,
-                                facet = facet
-    )
+                                facet = facet,
+                                large_n = large_n,
+                                large_n_sites = large_n_sites)
   }else if(output_function == 'csd_ms_anom_la'){
     csd_output <- csd_ms_anom_la(process_output=process_output,
                                  concept_col = concept_col,
-                                 filter_concept=filter_concept)
+                                 filter_concept=filter_concept,
+                                 large_n = large_n,
+                                 large_n_sites = large_n_sites)
   }else(cli::cli_abort('Please enter a valid output_function for this check'))
 
   return(csd_output)

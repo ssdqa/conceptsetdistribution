@@ -10,7 +10,9 @@ csd_ms_exp_la(
   facet = NULL,
   filtered_var,
   filtered_concept,
-  output_value = "prop_concept"
+  output_value = "prop_concept",
+  large_n = FALSE,
+  large_n_sites = NULL
 )
 }
 \arguments{
@@ -28,6 +30,11 @@ defaults to NULL}
 
 \item{output_value}{the numerical column in the data that should be displayed
 in the output}
+
+\item{large_n}{a boolean indicating whether the large N visualization, intended for a high
+volume of sites, should be used; defaults to FALSE}
+
+\item{large_n_sites}{a vector of site names that can optionally generate a filtered visualization}
 }
 \value{
 a line graph with one facet per code displaying the proportion of usage for

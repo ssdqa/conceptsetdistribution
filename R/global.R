@@ -17,4 +17,6 @@ utils::globalVariables(c('site', 'person_id', 'patid', 'start_date', 'end_date',
                          'conceptname1', 'conceptname2', 'ct_concept', 'ct_denom',
                          'date_field', 'domain', 'nmap', 'prop_concept', 'total_sum',
                          'var_jaccard_mean', 'var_jaccard_sd', 'vocabulary_field',
-                         'xaxis'))
+                         'xaxis', 'q1', 'q3', 'site_anoms', 'site_w_anom', 'zscr',
+                         'closest_site', 'concept_id_label', 'delim', 'farthest_site',
+                         'iqr_val', 'nvar', 'max_ct', 'min_ct', 'site_range'))
