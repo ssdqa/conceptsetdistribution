@@ -580,14 +580,28 @@ csd_ms_exp_cs <- function(process_output,
   if(large_n & is.null(large_n_sites)){
     process_output <- process_output %>%
       mutate(site = 'all sites') %>%
+      group_by(variable, !!sym(concept_col)) %>%
+      mutate(min_ct = min(prop_concept),
+             max_ct = max(prop_concept),
+             site_range = paste0(min_ct*100, '% - ', max_ct*100, '%')) %>%
       group_by(site, variable) %>%
       mutate(ct_denom = sum(ct_denom)) %>%
-      group_by(site, variable, !!sym(concept_col), ct_denom, concept_name) %>%
+      group_by(site, variable, !!sym(concept_col), ct_denom, concept_name,
+               site_range) %>%
       summarise(ct_concept = sum(ct_concept)) %>%
       mutate(prop_concept = ct_concept / ct_denom)
+
+    select_cols <- c(facet, 'variable', map_col, 'concept_name', ct, prop, 'site_range')
   }else if(large_n & !is.null(large_n_sites)){
     process_output <- process_output %>%
+      group_by(variable, !!sym(concept_col)) %>%
+      mutate(allsite_median = stats::median(prop_concept)) %>%
+      ungroup() %>%
       filter(site %in% large_n_sites)
+
+    select_cols <- c(facet, 'variable', map_col, 'concept_name', ct, prop, 'allsite_median')
+  }else if(!large_n){
+    select_cols <- c(facet, 'variable', map_col, 'concept_name', ct, prop)
   }
 
   topcodes <- process_output %>%
@@ -608,17 +622,33 @@ csd_ms_exp_cs <- function(process_output,
     mutate(pct = !!sym(prop)) %>%
     arrange(!!!syms(facet), desc(ct)) %>%
     #relocate(site) %>%
-    select(!!!syms(facet), variable, !!sym(map_col), concept_name, !!sym(ct), !!sym(prop), pct) %>%
+    select(!!!syms(select_cols), pct) %>%
     gt::gt() %>%
-    cols_nanoplot(columns = pct, plot_type = 'bar',
-                  autohide = TRUE, new_col_label = 'percent') %>%
-    #gtExtras::gt_plt_bar_pct(column = pct) %>%
     fmt_number(columns = ct, decimals = 0) %>%
     fmt_percent(columns = prop, decimals = 0) %>%
     data_color(palette = squba_colors_standard, columns = c(all_of(facet))) %>%
     tab_header(title = paste0('All Available Mappings for Top ', num_codes, ' Variables')) %>%
     opt_interactive(use_search = TRUE,
                     use_filters = TRUE)
+
+  if(!large_n){
+    table <- table %>%
+      cols_nanoplot(columns = pct, plot_type = 'bar',
+                    autohide = TRUE, new_col_label = 'percent')
+  }else if(large_n & is.null(large_n_sites)){
+    table <- table %>%
+      cols_nanoplot(columns = pct, plot_type = 'bar',
+                    autohide = TRUE, new_col_label = 'percent') %>%
+      cols_label('site_range' = 'site range') %>%
+      cols_move_to_end('site_range')
+  }else if(large_n & !is.null(large_n_sites)){
+    table <- table %>%
+      cols_nanoplot(columns = c(pct, 'allsite_median'), plot_type = 'bar',
+                    autohide = TRUE, new_col_label = 'compared to all-site median',
+                    options =
+                      nanoplot_options(data_bar_fill_color = c(squba_colors_standard[2],
+                                                               squba_colors_standard[3])))
+  }
 
 
   return(table)
