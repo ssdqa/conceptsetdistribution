@@ -4,7 +4,7 @@ template:
 navbar:
   left:
   - text: 'squba Home'
-    href: https://ssdqa.github.io/squba/index.html
+    href: https://ssdqa.github.io/squba/
   - text: 'Reference'
     href: reference/index.html
   - text: 'Vignettes'
@@ -17,6 +17,7 @@ reference:
   - csd_process
   - csd_output
 - title: 'Sample Input'
+  contents:
   - csd_domain_file
   - csd_concept_set
 
