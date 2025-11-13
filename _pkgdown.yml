@@ -1,0 +1,22 @@
+url: https://ssdqa.github.io/conceptsetdistribution/
+template:
+  bootstrap: 5
+navbar:
+  left:
+  - text: 'squba Home'
+    href: https://ssdqa.github.io/squba/index.html
+  - text: 'Reference'
+    href: reference/index.html
+  - text: 'Vignettes'
+    href: vignettes/index.html
+  - text: 'PEDSpace'
+    href: https://hdl.handle.net/20.500.14642/25
+reference:
+- title: 'Module Execution'
+  contents:
+  - csd_process
+  - csd_output
+- title: 'Sample Input'
+  - csd_domain_file
+  - csd_concept_set
+

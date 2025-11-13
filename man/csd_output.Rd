@@ -19,40 +19,89 @@ csd_output(
 )
 }
 \arguments{
-\item{process_output}{\emph{tabular input} | the output from \code{csd_process}}
+\item{process_output}{\emph{tabular input} || \strong{required}
 
-\item{concept_set}{\emph{tabular input} | the same concept set used in the \code{csd_process} function; only required if \code{vocab_tbl} is not NULL}
+The tabular output produced by \code{csd_process}}
 
-\item{vocab_tbl}{\emph{tabular input} | OPTIONAL: the location of an external vocabulary table containing concept names for
-the provided codes. if not NULL, concept names will be available in either a reference
-table or in a hover tooltip}
+\item{concept_set}{\emph{tabular input} || \strong{optional}
 
-\item{num_variables}{\emph{integer} | an integer to represent the top number of variables to include for the exploratory analyses;
-will pick based on the most commonly appearing variables;}
+The concept set originally used in the \code{csd_process} function. Recommended
+if no vocab_tbl is provided but the concept names are available in the concept set.}
 
-\item{num_mappings}{\emph{integer} | an integer to represent the top number of mappings for a given variable in the exploratory analyses;
-will pick based on the highest count of the most commonly appearing variables;}
+\item{vocab_tbl}{\emph{tabular input} || \strong{optional}
 
-\item{filter_variable}{\emph{string or vector} | the variable(s) to limit to for the analysis; used for all output types EXCEPT
-\code{ss_exp_cs}, \code{ms_exp_cs}, and \code{ms_anom_la}}
+A vocabulary table containing concept names for the provided codes
+(ex: the OMOP concept table)}
 
-\item{filter_concept}{\emph{numeric/string or vector} | the specific code(s) that should be the focus of the analysis; used for
-\code{ss_anom_la}, \code{ms_exp_la}, and \code{ms_anom_la}}
+\item{num_variables}{\emph{integer} || defaults to \code{30}
 
-\item{text_wrapping_char}{\emph{integer} | an integer to limit the length of text on an axis before wrapping is enforced;
-used for \code{ms_anom_cs}}
+An integer indicating the top N of variables to include for the exploratory analyses.
+The function will choose the most commonly occurring N variables to include in the plot.}
 
-\item{output_value}{\emph{string} | the name of the numerical column in \code{process_output} that should be used in the visualization
-used for \code{ss_exp_la}, \code{ms_anom_cs}, and \code{ms_exp_la}}
+\item{num_mappings}{\emph{integer} || defaults to \code{30}
 
-\item{large_n}{\emph{boolean} | for multi site analyses, a boolean indicating whether the large N visualization, intended for a high
-volume of sites, should be used; defaults to FALSE}
+An integer indicating the top N of concepts to include for the exploratory analyses.
+The function will choose the most commonly occurring N concepts per variable
+to include in the plot.}
 
-\item{large_n_sites}{\emph{vector} | when large_n = TRUE, a vector of site names that can optionally generate a filtered visualization}
+\item{filter_variable}{\emph{string or vector} || defaults to \code{NULL}
+
+The specific variable(s) to display in the output. This parameter is required
+for the following check types:
+\itemize{
+\item \verb{Single Site, Anomaly Detection, Cross-Sectional}
+\item \verb{Multi Site, Anomaly Detection, Cross-Sectional}
+\item \verb{Single Site, Exploratory, Longitudinal}
+\item \verb{Single Site, Anomaly Detection, Longitudinal}
+\item \verb{Multi Site, Exploratory, Longitudinal}
+}}
+
+\item{filter_concept}{\emph{numeric/string or vector} || defaults to \code{NULL}
+
+The specific code(s) to display in the output. This parameter is required
+for the following check types:
+\itemize{
+\item \verb{Single Site, Anomaly Detection, Longitudinal}
+\item \verb{Multi Site, Exploratory, Longitudinal}
+\item \verb{Multi Site, Anomaly Detection, Longitudinal}
+}}
+
+\item{text_wrapping_char}{\emph{integer} || defaults to \code{80}
+
+An integer indicating the length limit for text on an axis before
+wrapping is enforced. This is only used for the
+\verb{Multi Site, Anomaly Detection, Cross-Sectional} check type}
+
+\item{output_value}{\emph{string} || defaults to \code{prop_concept}
+
+The name of the numerical column in \code{process_output} that should be
+used in the output. This parameter is required for the following check
+types:
+\itemize{
+\item \verb{Multi-Site, Anomaly Detection, Cross-Sectional}
+\item \verb{Single Site, Exploratory, Longitudinal}
+\item \verb{Multi-Site, Exploratory, Longitudinal}
+}}
+
+\item{large_n}{\emph{boolean} || defaults to \code{FALSE}
+
+For Multi-Site analyses, a boolean indicating whether the large N
+visualization, intended for a high volume of sites, should be used. This
+visualization will produce high level summaries across all sites, with an
+option to add specific site comparators via the \code{large_n_sites} parameter.}
+
+\item{large_n_sites}{\emph{vector} || defaults to \code{NULL}
+
+When \code{large_n = TRUE}, a vector of site names that can add site-level information
+to the plot for comparison across the high level summary information.}
 }
 \value{
-a graph to visualize the results from \code{csd_process} based on the parameters provided; see documentation
-for individual subfunctions for details on specific output
+This function will produce a graph to visualize the results
+from \code{csd_process} based on the parameters provided. The default
+output is typically a static ggplot or gt object, but interactive
+elements can be activated by passing the plot through \code{make_interactive_squba}.
+For a more detailed description of output specific to each check type,
+see the PEDSpace metadata repository
 }
 \description{
 Using the tabular output generated by \code{csd_process}, this function will build a graph to

@@ -49,6 +49,7 @@
 #'
 #' @return a dataframe summarizing the distribution of code usage for each user defined variable
 #'
+#' @keywords internal
 #'
 csd_process_pcornet <- function(cohort,
                                 domain_tbl= conceptsetdistribution::csd_domain_file,

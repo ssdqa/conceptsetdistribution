@@ -53,6 +53,7 @@
 #' @import squba.gen
 #' @importFrom stringr str_wrap
 #'
+#' @keywords internal
 #'
 csd_process_omop <- function(cohort,
                              domain_tbl= conceptsetdistribution::csd_domain_file,

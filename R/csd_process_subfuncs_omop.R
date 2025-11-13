@@ -27,6 +27,8 @@
 #' @import dplyr
 #' @importFrom purrr reduce
 #'
+#' @keywords internal
+#'
 check_code_dist_csd_omop <- function(cohort_codedist,
                                      concept_set,
                                      time = FALSE,
@@ -150,6 +152,8 @@ check_code_dist_csd_omop <- function(cohort_codedist,
 #' @return the jaccard index of two different concepts for a given variable
 #'
 #' @importFrom stats setNames
+#'
+#' @keywords internal
 #'
 check_code_dist_ssanom_omop <- function(cohort_codedist,
                                         concept_set,

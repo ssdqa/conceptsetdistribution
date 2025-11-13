@@ -20,6 +20,8 @@
 #' @return returns variable and their concept mappings, both in counts and in proportions;
 #'         when `time = TRUE`, then output is given across time, and proportions computed within each variable
 #'
+#' @keywords internal
+#'
 check_code_dist_csd_pcnt <- function(cohort_codedist,
                                      concept_set,
                                      time = FALSE,
@@ -146,6 +148,8 @@ check_code_dist_csd_pcnt <- function(cohort_codedist,
 #'                             the *second* concept appears in the dataset
 #'
 #' @return the jaccard index of two different concepts for a given variable
+#'
+#' @keywords internal
 #'
 check_code_dist_ssanom_pcnt <- function(cohort_codedist,
                                    concept_set,

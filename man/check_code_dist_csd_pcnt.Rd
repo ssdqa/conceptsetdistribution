@@ -41,3 +41,4 @@ when \code{time = TRUE}, then output is given across time, and proportions compu
 \description{
 Base CSD function
 }
+\keyword{internal}

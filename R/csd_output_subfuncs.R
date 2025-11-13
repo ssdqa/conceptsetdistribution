@@ -36,6 +36,8 @@ NULL
 #'        with proportion for each concept.
 #'        2) a table with each mapping and the total variable count
 #'
+#' @keywords internal
+#'
 csd_ss_exp_cs <- function(process_output,
                           concept_col,
                           facet = NULL,
@@ -124,6 +126,8 @@ csd_ss_exp_cs <- function(process_output,
 #'
 #' @return for a given variable, a heatmap of the jaccard index for each concept pair
 #'
+#' @keywords internal
+#'
 csd_ss_anom_cs <- function(process_output,
                            #concept_col,
                            vocab_tbl = NULL,
@@ -211,6 +215,8 @@ csd_ss_anom_cs <- function(process_output,
 #'         if analysis was executed by month or smaller, an STL regression is
 #'         conducted and outliers are marked with red dots. the graphs representing
 #'         the data removed in the regression are also returned
+#'
+#' @keywords internal
 #'
 csd_ss_anom_la <- function(process_output,
                            concept_col,
@@ -316,6 +322,8 @@ csd_ss_anom_la <- function(process_output,
 #' @return a reference table with total counts of each code across the entire user selected
 #'         time period
 #'
+#' @keywords internal
+#'
 csd_ss_exp_la <- function(process_output,
                           concept_col,
                           facet=NULL,
@@ -410,6 +418,8 @@ csd_ss_exp_la <- function(process_output,
 #'         each site
 #' @return a reference table with total counts of each code across the entire user selected
 #'         time period
+#'
+#' @keywords internal
 #'
 csd_ms_exp_la <- function(process_output,
                           concept_col,
@@ -557,6 +567,8 @@ csd_ms_exp_la <- function(process_output,
 #'         denominator counts for the number of codes selected
 #'         in `num_codes`
 #'
+#' @keywords internal
+#'
 csd_ms_exp_cs <- function(process_output,
                           facet = NULL,
                           concept_col,
@@ -676,7 +688,8 @@ csd_ms_exp_cs <- function(process_output,
 #'         a given code, and the size of the dot represents the mean code
 #'         usage across all sites
 #'
-
+#' @keywords internal
+#'
 csd_ms_anom_cs<-function(process_output,
                          concept_col,
                          text_wrapping_char=80,
@@ -924,7 +937,8 @@ csd_ms_anom_cs<-function(process_output,
 #'
 #' THIS GRAPH SHOWS ONLY ONE CONCEPT AT A TIME!
 #'
-
+#' @keywords internal
+#'
 csd_ms_anom_la <- function(process_output,
                            filter_concept,
                            concept_col,

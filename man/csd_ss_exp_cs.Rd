@@ -34,3 +34,4 @@ with proportion for each concept.
 \description{
 \emph{Single Site, Exploratory, Cross-Sectional}
 }
+\keyword{internal}

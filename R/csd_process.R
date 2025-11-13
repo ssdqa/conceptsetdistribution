@@ -9,54 +9,121 @@
 #' This function is compatible with both the OMOP and the PCORnet CDMs based on the
 #' user's selection.
 #'
-#' @param cohort *tabular input* | cohort for SQUBA testing; required fields:
-#' - `site` | *character*
-#' - `person_id` | `patid` | *integer* / *character*
-#' - `start_date` | *date*
-#' - `end_date` | *date*
-#' @param domain_tbl *tabular input* | input table defining the domains listed in the annotated concept set
-#'                   four columns:
-#'                   - `domain` the name of the CDM table associated with the concept; should match what is listed in the annotated concept set
-#'                   - `concept_field` the name of the field in the domain table where the concepts are located
-#'                   - `date_field` the name of the field in the domain table with the date that should be used for time-based filtering
-#'                   - `vocabulary_field` PCORnet only; set to NA
-#' @param concept_set *tabular input* | an annotated concept set CSV file with the following columns:
-#' - `concept_id` | *integer* |  required for OMOP; the concept_id of interest
-#' - `concept_code` | *character* | required for PCORnet; the code of interest
-#' - `concept_name` | *character* | optional; the descriptive name of the concept
-#' - `vocabulary_id` | *character* | required for PCORnet; the vocabulary of the code - should match what is listed in the domain table's vocabulary_field
-#' - `variable` | *character* | required; a string label grouping one concept code into a larger variable definition
-#' - `domain` | *character* | required; the name of the CDM table where the concept is stored - multiple domains can be included in the file, but only one domain should be listed per row
-#' @param omop_or_pcornet *string* | Option to run the function using the OMOP or PCORnet CDM as the default CDM
-#' - `omop`: run the [csd_process_omop()] function against an OMOP CDM instance
-#' - `pcornet`: run the [csd_process_pcornet()] function against a PCORnet CDM instance
-#' @param multi_or_single_site *string* | Option to run the function on a single vs multiple sites
-#' - `single`: run the function for a single site
-#' - `multi`: run the function for multiple sites
-#' @param anomaly_or_exploratory *string* | Option to conduct an exploratory or anomaly detection analysis. Exploratory analyses give a high
-#' level summary of the data to examine the fact representation within the cohort. Anomaly detection
-#' analyses are specialized to identify outliers within the cohort.
-#' @param num_concept_combined *boolean* | when `multi_or_single_site` = `single` and `anomaly_or_exploratory` = `anomaly`,
-#' this argument is a boolean that will ensure that `concept1` and `concept2` meet some minimal threshold for including in the jaccard index
-#' if `TRUE`, then *both* conditions for `num_concept_1` and `num_concept_2` should be met; if `FALSE` then just one condition needs to be met.
-#' @param num_concept_1  *integer* | when `multi_or_single_site` = `single` and `anomaly_or_exploratory` = `anomaly`,
-#' this argument is an integer and requires a minimum number of times that the *first* concept appears in the dataset
-#' @param num_concept_2 *integer* | when `multi_or_single_site` = `single` and `anomaly_or_exploratory` = `anomaly`,
-#' this argument is an integer and requires a minimum number of times that the *second* concept appears in the dataset
-#' @param p_value *numeric* | the p value to be used as a threshold in the multi-site anomaly detection analysis
-#' @param age_groups *tabular input* | If you would like to stratify the results by age group,  create a table or CSV file with the following
-#'                   columns and include it as the `age_groups` function parameter:
-#' - `min_age` | *integer* | the minimum age for the group (i.e. 10)
-#' - `max_age` | *integer* | the maximum age for the group (i.e. 20)
-#' - `group` | *character* | a string label for the group (i.e. 10-20, Young Adult, etc.)
+#' @param cohort *tabular input* || **required**
 #'
-#' If you would *not* like to stratify by age group, leave the argument as NULL
-#' @param time *boolean* | logical to determine whether to output the check across time
-#' @param time_span *vector - length 2* | when time = TRUE, a vector of two dates for the observation period of the study
-#' @param time_period *string* | when time = TRUE, this argument defines the distance between dates within the specified time period. defaults
-#'                    to `year`, but other time periods such as `month` or `week` are also acceptable
+#'   The cohort to be used for data quality testing. This table should contain,
+#'   at minimum:
+#'   - `site` | *character* | the name(s) of institutions included in your cohort
+#'   - `person_id` / `patid` | *integer* / *character* | the patient identifier
+#'   - `start_date` | *date* | the start of the cohort period
+#'   - `end_date` | *date* | the end of the cohort period
 #'
-#' @return a dataframe summarizing the distribution of code usage for each user defined variable
+#'   Note that the start and end dates included in this table will be used to
+#'   limit the search window for the analyses in this module.
+#'
+#' @param domain_tbl *tabular input* || **required**
+#'
+#'   A table or CSV file defining the domains listed in the annotated concept set.
+#'   This input should contain four columns:
+#'   - `domain` | *character* | a string identifying the CDM table, as listed in the annotated concept set, where the concept of interest can be identified
+#'   - `concept_field` | *character*| the string name of the field in the domain table where the concepts are located
+#'   - `date_field` | *character* |  the name of the field in the domain table with the date that should be used for temporal filtering
+#'   - `vocabulary_field` | *character* | for PCORnet applications, the name of the field in the domain table with a vocabulary identifier to differentiate concepts from one another (ex: dx_type); can be set to NA for OMOP applications
+#'
+#'   To see an example of what this input should look like, see `?conceptsetdistribution::csd_domain_file`
+#'
+#' @param concept_set *tabular input* || **required**
+#'
+#'   A table or CSV containing the concepts to be investigated, plus some additional
+#'   metadata. This input should contain one of following:
+#'   - `concept_id` | *integer* | the concept_id of interest (required for OMOP)
+#'   - `concept_code` | *character* | the code of interest (required for PCORnet)
+#'
+#'   And both of:
+#'   - `variable` | *character* | a string label grouping one concept code into a larger variable definition
+#'   - `domain` | *character* | the name of the CDM table where the concept can be found
+#'
+#'   For certain PCORnet applications, it should also contain
+#'   - `vocabulary_id` | *character* | the vocabulary of the code, which should match what is listed in the domain table's `vocabulary_field`
+#'
+#'   To see an example of what this input should look like, see `?conceptsetdistribution::csd_concept_set`
+#'
+#' @param omop_or_pcornet *string* || **required**
+#'
+#'   A string, either `omop` or `pcornet`, indicating the CDM format of the data
+#'
+#'    - `omop`: run the [csd_process_omop()] function against an OMOP CDM instance
+#'    - `pcornet`: run the [csd_process_pcornet()] function against a PCORnet CDM instance
+#'
+#' @param multi_or_single_site *string* || defaults to `single`
+#'
+#'   A string, either `single` or `multi`, indicating whether a single-site or
+#'   multi-site analysis should be executed
+#'
+#' @param anomaly_or_exploratory *string* || defaults to `exploratory`
+#'
+#'   A string, either `anomaly` or `exploratory`, indicating what type of results
+#'   should be produced.
+#'
+#'   Exploratory analyses give a high level summary of the data to examine the
+#'   fact representation within the cohort. Anomaly detection analyses are
+#'   specialized to identify outliers within the cohort.
+#'
+#' @param num_concept_combined *boolean* || defaults to `FALSE`
+#'
+#'   When `multi_or_single_site` = `single` and `anomaly_or_exploratory` = `anomaly`,
+#'   this argument is a boolean that will ensure that `concept1` and `concept2`
+#'   meet some minimal threshold for inclusion in the Jaccard index computation.
+#'
+#'   if `TRUE`, then *both* conditions for `num_concept_1` and `num_concept_2`
+#'   should be met; if `FALSE` then just one condition needs to be met.
+#'
+#' @param num_concept_1 *integer* || defaults to `30`
+#'
+#'   When `multi_or_single_site` = `single` and `anomaly_or_exploratory` = `anomaly`,
+#'   this argument indicates the minimum number of times that the *first* concept
+#'   appears in the dataset during the Jaccard index computation
+#'
+#' @param num_concept_2 *integer* || defaults to `30`
+#'
+#'   When `multi_or_single_site` = `single` and `anomaly_or_exploratory` = `anomaly`,
+#'   this argument indicates the minimum number of times that the *second* concept
+#'   appears in the dataset during the Jaccard index computation
+#'
+#' @param p_value *numeric* || defaults to `0.9`
+#'
+#'   The p value to be used as a threshold in the Multi-Site,
+#'   Anomaly Detection, Cross-Sectional analysis
+#'
+#' @param age_groups *tabular input* || defaults to `NULL`
+#'
+#'   If you would like to stratify the results by age group, create a table or
+#'   CSV file with the following columns and use it as input to this parameter:
+#'
+#'   - `min_age` | *integer* | the minimum age for the group (i.e. 10)
+#'   - `max_age` | *integer* | the maximum age for the group (i.e. 20)
+#'   - `group` | *character* | a string label for the group (i.e. 10-20, Young Adult, etc.)
+#'
+#'   If you would *not* like to stratify by age group, leave as `NULL`
+#'
+#' @param time *boolean* || defaults to `FALSE`
+#'
+#'   A boolean to indicate whether to execute a longitudinal analysis
+#'
+#' @param time_span *vector - length 2* || defaults to `c('2012-01-01', '2020-01-01')`
+#'
+#'   A vector indicating the lower and upper bounds of the time series for longitudinal analyses
+#'
+#' @param time_period *string* || defaults to `year`
+#'
+#'   A string indicating the distance between dates within the specified time_span.
+#'   Defaults to `year`, but other time periods such as `month` or `week` are
+#'   also acceptable
+#'
+#' @return This function will return a dataframe summarizing the
+#'         distribution of code usage for each user defined variable. For a
+#'         more detailed description of output specific to each check type,
+#'         see the PEDSpace metadata repository
 #'
 #' @import argos
 #' @import squba.gen
@@ -76,7 +143,7 @@ csd_process <- function(cohort,
                         num_concept_1 = 30,
                         num_concept_2 = 30,
                         p_value = 0.9,
-                        age_groups = FALSE,
+                        age_groups = NULL,
                         time = FALSE,
                         time_span = c('2012-01-01', '2020-01-01'),
                         time_period = 'year'

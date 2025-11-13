@@ -6,29 +6,82 @@
 #' be adjusted by the user after the graph has been output using `+ theme()`. Most graphs can
 #' also be made interactive using `make_interactive_squba()`
 #'
-#' @param process_output *tabular input* | the output from `csd_process`
-#' @param concept_set *tabular input* | the same concept set used in the `csd_process` function; only required if `vocab_tbl` is not NULL
-#' @param vocab_tbl *tabular input* | OPTIONAL: the location of an external vocabulary table containing concept names for
-#'                  the provided codes. if not NULL, concept names will be available in either a reference
-#'                  table or in a hover tooltip
-#' @param num_variables *integer* | an integer to represent the top number of variables to include for the exploratory analyses;
-#'                      will pick based on the most commonly appearing variables;
-#' @param num_mappings *integer* | an integer to represent the top number of mappings for a given variable in the exploratory analyses;
-#'                     will pick based on the highest count of the most commonly appearing variables;
-#' @param filter_variable *string or vector* | the variable(s) to limit to for the analysis; used for all output types EXCEPT
-#'                        `ss_exp_cs`, `ms_exp_cs`, and `ms_anom_la`
-#' @param filter_concept *numeric/string or vector* | the specific code(s) that should be the focus of the analysis; used for
-#'                       `ss_anom_la`, `ms_exp_la`, and `ms_anom_la`
-#' @param text_wrapping_char *integer* | an integer to limit the length of text on an axis before wrapping is enforced;
-#'                           used for `ms_anom_cs`
-#' @param output_value *string* | the name of the numerical column in `process_output` that should be used in the visualization
-#'                     used for `ss_exp_la`, `ms_anom_cs`, and `ms_exp_la`
-#' @param large_n *boolean* | for multi site analyses, a boolean indicating whether the large N visualization, intended for a high
-#'                volume of sites, should be used; defaults to FALSE
-#' @param large_n_sites *vector* | when large_n = TRUE, a vector of site names that can optionally generate a filtered visualization
+#' @param process_output *tabular input* || **required**
 #'
-#' @return a graph to visualize the results from `csd_process` based on the parameters provided; see documentation
-#'         for individual subfunctions for details on specific output
+#'   The tabular output produced by `csd_process`
+#'
+#' @param concept_set *tabular input* || **optional**
+#'
+#'   The concept set originally used in the `csd_process` function. Recommended
+#'   if no vocab_tbl is provided but the concept names are available in the concept set.
+#'
+#' @param vocab_tbl *tabular input* || **optional**
+#'
+#'   A vocabulary table containing concept names for the provided codes
+#'   (ex: the OMOP concept table)
+#'
+#' @param num_variables *integer* || defaults to `30`
+#'
+#'   An integer indicating the top N of variables to include for the exploratory analyses.
+#'   The function will choose the most commonly occurring N variables to include in the plot.
+#'
+#' @param num_mappings *integer* || defaults to `30`
+#'
+#'   An integer indicating the top N of concepts to include for the exploratory analyses.
+#'   The function will choose the most commonly occurring N concepts per variable
+#'   to include in the plot.
+#'
+#' @param filter_variable *string or vector* || defaults to `NULL`
+#'
+#'   The specific variable(s) to display in the output. This parameter is required
+#'   for the following check types:
+#'   - `Single Site, Anomaly Detection, Cross-Sectional`
+#'   - `Multi Site, Anomaly Detection, Cross-Sectional`
+#'   - `Single Site, Exploratory, Longitudinal`
+#'   - `Single Site, Anomaly Detection, Longitudinal`
+#'   - `Multi Site, Exploratory, Longitudinal`
+#'
+#' @param filter_concept *numeric/string or vector* || defaults to `NULL`
+#'
+#'   The specific code(s) to display in the output. This parameter is required
+#'   for the following check types:
+#'   - `Single Site, Anomaly Detection, Longitudinal`
+#'   - `Multi Site, Exploratory, Longitudinal`
+#'   - `Multi Site, Anomaly Detection, Longitudinal`
+#'
+#' @param text_wrapping_char *integer* || defaults to `80`
+#'
+#'   An integer indicating the length limit for text on an axis before
+#'   wrapping is enforced. This is only used for the
+#'   `Multi Site, Anomaly Detection, Cross-Sectional` check type
+#'
+#' @param output_value *string* || defaults to `prop_concept`
+#'
+#'   The name of the numerical column in `process_output` that should be
+#'   used in the output. This parameter is required for the following check
+#'   types:
+#'   - `Multi-Site, Anomaly Detection, Cross-Sectional`
+#'   - `Single Site, Exploratory, Longitudinal`
+#'   - `Multi-Site, Exploratory, Longitudinal`
+#'
+#' @param large_n *boolean* || defaults to `FALSE`
+#'
+#'   For Multi-Site analyses, a boolean indicating whether the large N
+#'   visualization, intended for a high volume of sites, should be used. This
+#'   visualization will produce high level summaries across all sites, with an
+#'   option to add specific site comparators via the `large_n_sites` parameter.
+#'
+#' @param large_n_sites *vector* || defaults to `NULL`
+#'
+#'   When `large_n = TRUE`, a vector of site names that can add site-level information
+#'   to the plot for comparison across the high level summary information.
+#'
+#' @return This function will produce a graph to visualize the results
+#'         from `csd_process` based on the parameters provided. The default
+#'         output is typically a static ggplot or gt object, but interactive
+#'         elements can be activated by passing the plot through `make_interactive_squba`.
+#'         For a more detailed description of output specific to each check type,
+#'         see the PEDSpace metadata repository
 #'
 #' @example inst/example-csd_process_output.R
 #'
