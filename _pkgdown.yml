@@ -10,6 +10,9 @@ navbar:
     href: reference/index.html
   - text: 'Articles'
     href: articles/index.html
+    menu:
+    - text: 'Multi-Site Analysis for Independent Data Sources'
+      href: articles/multisite_independent.html
   - text: 'PEDSpace'
     href: https://hdl.handle.net/20.500.14642/25
 reference:
