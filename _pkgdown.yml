@@ -1,14 +1,15 @@
 url: https://ssdqa.github.io/conceptsetdistribution/
 template:
   bootstrap: 5
+  light-switch: true
 navbar:
   left:
   - text: 'squba Home'
     href: https://ssdqa.github.io/squba/
   - text: 'Reference'
     href: reference/index.html
-  - text: 'Vignettes'
-    href: vignettes/index.html
+  - text: 'Articles'
+    href: articles/index.html
   - text: 'PEDSpace'
     href: https://hdl.handle.net/20.500.14642/25
 reference:
