@@ -31,7 +31,12 @@
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="external-link nav-link" href="https://ssdqa.github.io/squba/">squba Home</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="active nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
+<li class="active nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><a class="dropdown-item" href="../articles/multisite_independent.html">Multi-Site Analysis for Independent Data Sources</a></li>
+  </ul>
+</li>
 <li class="nav-item"><a class="external-link nav-link" href="https://hdl.handle.net/20.500.14642/25">PEDSpace</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -79,9 +84,9 @@ multi-site analysis can be executed in these instances.</p>
 </h2>
 <p>The process for the exploratory analysis is the same for both the
 cross-sectional and longitudinal configurations.</p>
-<p>First, execute the <strong>Single Site, Exploratory,
-Cross-Sectional</strong> analysis, configured appropriately for your
-study, against each data source.</p>
+<p>First, execute either of the <strong>Single Site,
+Exploratory</strong> analyses, configured appropriately for your study,
+against each data source.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ssdqa/conceptsetdistribution" class="external-link">conceptsetdistribution</a></span><span class="op">)</span></span>
 <span></span>

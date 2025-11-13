@@ -11,9 +11,8 @@ multi-site analysis can be executed in these instances.
 The process for the exploratory analysis is the same for both the
 cross-sectional and longitudinal configurations.
 
-First, execute the **Single Site, Exploratory, Cross-Sectional**
-analysis, configured appropriately for your study, against each data
-source.
+First, execute either of the **Single Site, Exploratory** analyses,
+configured appropriately for your study, against each data source.
 
 ``` r
 library(conceptsetdistribution)
