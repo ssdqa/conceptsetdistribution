@@ -114,16 +114,17 @@ also be made interactive using \code{make_interactive_squba()}
 #' Source setup file
 source(system.file('setup.R', package = 'conceptsetdistribution'))
 
+getwd()
+
 #' Create in-memory RSQLite database using data in extdata directory
 conn <- mk_testdb_omop()
 
 #' Establish connection to database and generate internal configurations
 initialize_dq_session(session_name = 'csd_process_test',
-                      working_directory = getwd(),
+                      working_directory = my_directory,
                       db_conn = conn,
                       is_json = FALSE,
-                      file_subdirectory = system.file('extdata',
-                                        package = 'conceptsetdistribution'),
+                      file_subdirectory = my_file_folder,
                       cdm_schema = NA)
 
 #' Build mock study cohort
