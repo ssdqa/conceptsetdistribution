@@ -205,16 +205,19 @@ csd_process_example <- csd_process(cohort = cohort,
                                    time = FALSE,
                                    omop_or_pcornet = 'omop',
                                    domain_tbl = csd_domain_tbl,
-                                   concept_set = csd_concept_tbl)
+                                   concept_set = csd_concept_tbl) \%>\%
+  suppressMessages()
 
 csd_process_example
 
 #' Execute `csd_output` function
 csd_output_example <- csd_output(process_output = csd_process_example,
                                  concept_set = csd_concept_tbl,
-                                 vocab_tbl = NULL)
+                                 vocab_tbl = NULL) \%>\%
+  suppressMessages()
 
-csd_output_example
+csd_output_example[[1]]
+csd_output_example[[2]]
 
 #' Easily convert the graph into an interactive ggiraph or plotly object with
 #' `make_interactive_squba()`
