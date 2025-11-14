@@ -2,8 +2,6 @@
 #' Source setup file
 source(system.file('setup.R', package = 'conceptsetdistribution'))
 
-getwd()
-
 #' Create in-memory RSQLite database using data in extdata directory
 conn <- mk_testdb_omop()
 
@@ -54,7 +52,6 @@ csd_output_example <- csd_output(process_output = csd_process_example,
   suppressMessages()
 
 csd_output_example[[1]]
-csd_output_example[[2]]
 
 #' Easily convert the graph into an interactive ggiraph or plotly object with
 #' `make_interactive_squba()`
