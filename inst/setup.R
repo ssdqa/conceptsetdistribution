@@ -1,12 +1,7 @@
 # Generate a test DB with synthetic omop data
 testdb <- NULL
-if(grepl('^/home/runner/work/', getwd())){
-  my_directory <- '/home/runner/work/_temp/Library/conceptsetdistribution'
-  my_file_folder <- 'extdata'
-}else{
-  my_directory <- getwd()
-  my_file_folder <- system.file('extdata', package = 'conceptsetdistribution')
-}
+my_directory <- system.file(package = 'conceptsetdistribution')
+my_file_folder <- system.file('extdata', package = 'conceptsetdistribution')
 # Function to generate omop test db
 mk_testdb_omop <- function(){
   if (! is.null(testdb)) return(testdb)
