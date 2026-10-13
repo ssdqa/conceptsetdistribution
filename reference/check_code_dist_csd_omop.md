@@ -59,12 +59,18 @@ check_code_dist_csd_omop(
 - domain_tbl:
 
   input table defining the domains listed in the annotated concept set
-  four columns: - `domain` the name of the CDM table associated with the
-  concept; should match what is listed in the annotated concept set -
-  `concept_field` the name of the field in the domain table where the
-  concepts are located - `date_field` the name of the field in the
-  domain table with the date that should be used for time-based
-  filtering - `vocabulary_field` PCORnet only; set to NA
+  four columns:
+
+  - `domain` the name of the CDM table associated with the concept;
+    should match what is listed in the annotated concept set
+
+  - `concept_field` the name of the field in the domain table where the
+    concepts are located
+
+  - `date_field` the name of the field in the domain table with the date
+    that should be used for time-based filtering
+
+  - `vocabulary_field` PCORnet only; set to NA
 
 ## Value
 

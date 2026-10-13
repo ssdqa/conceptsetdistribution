@@ -27,6 +27,7 @@ First, execute either of the **Single Site, Exploratory** analyses,
 configured appropriately for your study, against each data source.
 
 ``` r
+
 library(conceptsetdistribution)
 
 my_table <- csd_process(cohort = my_cohort,
@@ -64,6 +65,7 @@ column. For the PCORnet CDM, `concept_code` should be input as the
 concept column. The `p_value` can be selected by the user.
 
 ``` r
+
 # First execute the compute_dist_anomalies function
 df_start <- compute_dist_anomalies(df_tbl = my_table,
                                    grp_vars = c('variable', concept_column),
@@ -90,6 +92,7 @@ column. For the PCORnet CDM, `concept_code` should be input as the
 concept column.
 
 ``` r
+
 df <- ms_anom_euclidean(fot_input_tbl = csd_tbl,
                         grp_vars = c('site', 'variable',
                                      concept_column),

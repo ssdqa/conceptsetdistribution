@@ -39,13 +39,19 @@ csd_process_pcornet(
 - domain_tbl:
 
   input table defining the domains listed in the annotated concept set
-  four columns: - `domain` the name of the CDM table associated with the
-  concept; should match what is listed in the annotated concept set -
-  `concept_field` the name of the field in the domain table where the
-  concepts are located - `date_field` the name of the field in the
-  domain table with the date that should be used for time-based
-  filtering - `vocabulary_field` PCORnet only; the field in the domain
-  table where the vocabulary of the code is stored (i.e. dx_type)
+  four columns:
+
+  - `domain` the name of the CDM table associated with the concept;
+    should match what is listed in the annotated concept set
+
+  - `concept_field` the name of the field in the domain table where the
+    concepts are located
+
+  - `date_field` the name of the field in the domain table with the date
+    that should be used for time-based filtering
+
+  - `vocabulary_field` PCORnet only; the field in the domain table where
+    the vocabulary of the code is stored (i.e. dx_type)
 
 - concept_set:
 

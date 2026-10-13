@@ -17,7 +17,7 @@
 Source:
 [`DESCRIPTION`](https://github.com/ssdqa/conceptsetdistribution/blob/main/DESCRIPTION)
 
-Razzaghi H, Wieand K, Dickinson K, Bailey C (2025).
+Razzaghi H, Wieand K, Dickinson K, Bailey C (2026).
 *conceptsetdistribution: Examine the Distribution of Concept
 Representation*. R package version 0.0.0.9000,
 <https://github.com/ssdqa/conceptsetdistribution>.
@@ -25,7 +25,7 @@ Representation*. R package version 0.0.0.9000,
     @Manual{,
       title = {conceptsetdistribution: Examine the Distribution of Concept Representation},
       author = {Hanieh Razzaghi and Kaleigh Wieand and Kimberley Dickinson and Charles Bailey},
-      year = {2025},
+      year = {2026},
       note = {R package version 0.0.0.9000},
       url = {https://github.com/ssdqa/conceptsetdistribution},
     }
