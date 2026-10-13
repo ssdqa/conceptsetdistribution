@@ -36,14 +36,21 @@ check_code_dist_csd_omop <- function(cohort_codedist,
                                      time_period,
                                      domain_tbl = conceptsetdistribution::csd_domain_file){
 
-
-  domain_filter <-
-    concept_set %>% select(domain, variable) %>% distinct() %>%
-    inner_join(domain_tbl)
   if(any(class(concept_set) %in% 'tbl_sql')){
     concept_set_db <- concept_set
   }else{
     concept_set_db <- copy_to_new(df=concept_set, name='concept_set')
+  }
+
+  if(any(class(domain_tbl) %in% 'tbl_sql')){
+    domain_filter <- concept_set_db %>%
+      select(domain, variable) %>% distinct() %>%
+      inner_join(domain_tbl) %>% collect()
+  }else{
+    domain_filter <- concept_set %>%
+      collect() %>%
+      select(domain, variable) %>% distinct() %>%
+      inner_join(domain_tbl)
   }
 
   fact_tbl_final <- list()
@@ -166,15 +173,23 @@ check_code_dist_ssanom_omop <- function(cohort_codedist,
                                         num_concept_2 = 30,
                                         domain_tbl = conceptsetdistribution::csd_domain_file){
 
-
-  domain_filter <-
-    concept_set %>% select(domain) %>% distinct() %>%
-    inner_join(domain_tbl)
   if(any(class(concept_set) %in% 'tbl_sql')){
     concept_set_db <- concept_set
   }else{
     concept_set_db <- copy_to_new(df=concept_set, name='concept_set')
   }
+
+  if(any(class(domain_tbl) %in% 'tbl_sql')){
+    domain_filter <- concept_set_db %>%
+      select(domain, variable) %>% distinct() %>%
+      inner_join(domain_tbl) %>% collect()
+  }else{
+    domain_filter <- concept_set %>%
+      collect() %>%
+      select(domain, variable) %>% distinct() %>%
+      inner_join(domain_tbl)
+  }
+
   variable_list <- concept_set_db %>% distinct(variable) %>% pull()
 
       variable_summary <- list()
