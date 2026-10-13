@@ -35,10 +35,12 @@ to \code{year}, but other time periods such as \code{month} or \code{week} are a
 
 \item{domain_tbl}{input table defining the domains listed in the annotated concept set
 four columns:
-- \code{domain} the name of the CDM table associated with the concept; should match what is listed in the annotated concept set
-- \code{concept_field} the name of the field in the domain table where the concepts are located
-- \code{date_field} the name of the field in the domain table with the date that should be used for time-based filtering
-- \code{vocabulary_field} PCORnet only; set to NA}
+\itemize{
+\item \code{domain} the name of the CDM table associated with the concept; should match what is listed in the annotated concept set
+\item \code{concept_field} the name of the field in the domain table where the concepts are located
+\item \code{date_field} the name of the field in the domain table with the date that should be used for time-based filtering
+\item \code{vocabulary_field} PCORnet only; set to NA
+}}
 }
 \value{
 returns variable and its concept mappings, both in counts and in proportions;

@@ -31,10 +31,12 @@ csd_process_omop(
 
 \item{domain_tbl}{input table defining the domains listed in the annotated concept set
 four columns:
-- \code{domain} the name of the CDM table associated with the concept; should match what is listed in the annotated concept set
-- \code{concept_field} the name of the field in the domain table where the concepts are located
-- \code{date_field} the name of the field in the domain table with the date that should be used for time-based filtering
-- \code{vocabulary_field} PCORnet only; set to NA}
+\itemize{
+\item \code{domain} the name of the CDM table associated with the concept; should match what is listed in the annotated concept set
+\item \code{concept_field} the name of the field in the domain table where the concepts are located
+\item \code{date_field} the name of the field in the domain table with the date that should be used for time-based filtering
+\item \code{vocabulary_field} PCORnet only; set to NA
+}}
 
 \item{concept_set}{an annotated concept set CSV file with the following columns:
 \itemize{

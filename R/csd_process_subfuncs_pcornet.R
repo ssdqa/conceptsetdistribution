@@ -33,7 +33,11 @@ check_code_dist_csd_pcnt <- function(cohort_codedist,
   domain_filter <-
     concept_set %>% select(domain, variable) %>% distinct() %>%
     inner_join(domain_tbl)
-  concept_set_db <- copy_to_new(df=concept_set, name='concept_set')
+  if(any(class(concept_set) %in% 'tbl_sql')){
+    concept_set_db <- concept_set
+  }else{
+    concept_set_db <- copy_to_new(df=concept_set, name='concept_set')
+  }
 
   fact_tbl_final <- list()
 
@@ -162,7 +166,11 @@ check_code_dist_ssanom_pcnt <- function(cohort_codedist,
   domain_filter <-
     concept_set %>% select(domain) %>% distinct() %>%
     inner_join(domain_tbl)
-  concept_set_db <- copy_to_new(df=concept_set, name='concept_set')
+  if(any(class(concept_set) %in% 'tbl_sql')){
+    concept_set_db <- concept_set
+  }else{
+    concept_set_db <- copy_to_new(df=concept_set, name='concept_set')
+  }
   variable_list <- concept_set_db %>% distinct(variable) %>% pull()
 
       variable_summary <- list()
