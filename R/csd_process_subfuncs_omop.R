@@ -236,7 +236,7 @@ check_code_dist_ssanom_omop <- function(cohort_codedist,
           group_by(person_id,concept_id, variable, domain,
                    .add=TRUE) %>%
           summarise(ct=n()) %>%
-          compute_new(temporary=TRUE)
+          compute_new()
 
         variable_combined[[n]] <- one_domain_tbl
 
